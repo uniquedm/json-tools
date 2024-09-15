@@ -1,13 +1,13 @@
-import { HashRouter as Router, Route, Routes } from 'react-router-dom';
-import './App.css';
-import AppDrawer from './components/AppDrawer';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { useState } from 'react';
-import { darkTheme } from './common/Themes';
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import { useState } from "react";
+import { Route, HashRouter as Router, Routes } from "react-router-dom";
+import "./App.css";
+import { darkTheme } from "./common/Themes";
+import AppDrawer from "./components/AppDrawer";
 
 function Home() {
-  const [theme, setTheme] = useState(darkTheme)
+  const [theme, setTheme] = useState(darkTheme);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -27,4 +27,3 @@ function App() {
 }
 
 export default App;
-

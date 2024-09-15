@@ -13,7 +13,7 @@ export const defaultEditorValue = `{
         "deepNestedField": "Deep value"
       }
     }
-  }`
+  }`;
 
 export const defaultModifiedValue = `{
     "stringField": "Hello, world!",
@@ -29,39 +29,39 @@ export const defaultModifiedValue = `{
         "deepNestedField": "Deep value"
       }
     }
-  }`
+  }`;
 
 export const defaultEditorJSON = {
-  "stringField": "Hello, world!",
-  "numberField": 12345,
-  "booleanField": true,
-  "nullField": null,
-  "arrayField": [1, "two", false, null, { "nestedObject": "value" }],
-  "objectField": {
-    "nestedString": "Nested Hello",
-    "nestedNumber": 67890,
-    "nestedBoolean": false,
-    "nestedArray": [5, 6, 7],
-    "nestedObject": {
-      "deepNestedField": "Deep value"
-    }
-  }
-}
+  stringField: "Hello, world!",
+  numberField: 12345,
+  booleanField: true,
+  nullField: null,
+  arrayField: [1, "two", false, null, { nestedObject: "value" }],
+  objectField: {
+    nestedString: "Nested Hello",
+    nestedNumber: 67890,
+    nestedBoolean: false,
+    nestedArray: [5, 6, 7],
+    nestedObject: {
+      deepNestedField: "Deep value",
+    },
+  },
+};
 
 export const supportedLanguages = [
   "javascript",
   "typescript",
   "python",
   "java",
-  "csharp",        // C#
-  "cpp",           // C++
+  "csharp", // C#
+  "cpp", // C++
   "php",
   "ruby",
   "html",
   "css",
   "scss",
   "less",
-  "shell",         // Shell scripting
+  "shell", // Shell scripting
   "sql",
   "json",
   "xml",
@@ -81,18 +81,18 @@ export const supportedLanguages = [
   "rust",
   "graphql",
   "dart",
-  "bat",           // Batch scripting
+  "bat", // Batch scripting
   "ini",
   "handlebars",
   "pug",
-  "protobuf",      // Protocol Buffers (proto)
+  "protobuf", // Protocol Buffers (proto)
   "razor",
   "clojure",
   "elixir",
   "julia",
-  "fsharp",        // F#
-  "sol",           // Solidity
-  "hcl",           // HashiCorp Configuration Language
+  "fsharp", // F#
+  "sol", // Solidity
+  "hcl", // HashiCorp Configuration Language
   "apex",
   "abap",
   "cypher",
@@ -128,16 +128,16 @@ export const supportedLanguages = [
   "redis",
   "redshift",
   "restructuredtext",
-  "sb",            // Small Basic
+  "sb", // Small Basic
   "scheme",
   "sparql",
-  "st",            // Structured Text
+  "st", // Structured Text
   "systemverilog",
   "verilog",
   "tcl",
   "typespec",
   "vb",
   "wgsl",
-  "aes",           // Advanced Encryption Standard
-  "ecl"            // ECL (Enterprise Control Language)
+  "aes", // Advanced Encryption Standard
+  "ecl", // ECL (Enterprise Control Language)
 ];

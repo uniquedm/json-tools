@@ -1,5 +1,5 @@
-import { createTheme, Theme } from '@mui/material/styles';
-import { Dispatch, SetStateAction } from 'react';
+import { createTheme, Theme } from "@mui/material/styles";
+import { Dispatch, SetStateAction } from "react";
 
 export interface ThemeInput {
   setTheme: Dispatch<SetStateAction<Theme>>;
@@ -7,12 +7,12 @@ export interface ThemeInput {
 
 export const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
   },
 });
 
 export const lightTheme = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
   },
 });

@@ -1,32 +1,33 @@
-import * as React from 'react';
-import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import { Stack, Tooltip } from '@mui/material';
-import GithubStarCount from './GithubStarCount';
-import DarkModeSwitch from './DarkModeSwitch';
-import { mainUtilities, Utility, extraUtilities } from '../common/Utilities';
-import { ThemeInput } from '../common/Themes';
-
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MenuIcon from "@mui/icons-material/Menu";
+import { Stack, Tooltip } from "@mui/material";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import MuiDrawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import * as React from "react";
+import { ThemeInput } from "../common/Themes";
+import { extraUtilities, mainUtilities, Utility } from "../common/Utilities";
+import DarkModeSwitch from "./features/DarkModeSwitch";
+import GithubStarCount from "./features/GithubStarCount";
 
 export default function AppDrawer({ setTheme }: ThemeInput) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [currentUtility, setCurrentUtility] = React.useState(mainUtilities["FORMAT"])
+  const [currentUtility, setCurrentUtility] = React.useState(
+    mainUtilities["FORMAT"]
+  );
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -40,12 +41,12 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
     return (
       <List>
         {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
-          <ListItem key={utilityName} disablePadding sx={{ display: 'block' }}>
+          <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
             <ListItemButton
               onClick={() => {
                 currentUtility["isOpen"] = false;
                 utilityDetails["isOpen"] = true;
-                setCurrentUtility(utilityDetails)
+                setCurrentUtility(utilityDetails);
               }}
               sx={[
                 {
@@ -55,11 +56,11 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
                 },
                 open
                   ? {
-                    justifyContent: 'initial',
-                  }
+                      justifyContent: "initial",
+                    }
                   : {
-                    justifyContent: 'center',
-                  },
+                      justifyContent: "center",
+                    },
               ]}
             >
               <Tooltip title={utilityDetails["tooltip"]}>
@@ -68,15 +69,15 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
                     {
                       color: utilityDetails["isOpen"] ? "#90caf9" : "gray",
                       minWidth: 0,
-                      justifyContent: 'center',
+                      justifyContent: "center",
                     },
                     open
                       ? {
-                        mr: 3,
-                      }
+                          mr: 3,
+                        }
                       : {
-                        mr: 'auto',
-                      },
+                          mr: "auto",
+                        },
                   ]}
                 >
                   {utilityDetails["navIcon"]}
@@ -87,11 +88,11 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
                 sx={[
                   open
                     ? {
-                      opacity: 1,
-                    }
+                        opacity: 1,
+                      }
                     : {
-                      opacity: 0,
-                    },
+                        opacity: 0,
+                      },
                 ]}
               />
             </ListItemButton>
@@ -99,10 +100,10 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
         ))}
       </List>
     );
-  }
+  };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
@@ -115,7 +116,7 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
               {
                 marginRight: 5,
               },
-              open && { display: 'none' },
+              open && { display: "none" },
             ]}
           >
             <MenuIcon />
@@ -133,7 +134,11 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
           </IconButton>
         </DrawerHeader>
         <Divider />
@@ -150,29 +155,29 @@ const drawerWidth = 180;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
-  transition: theme.transitions.create('width', {
+  transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  overflowX: 'hidden',
+  overflowX: "hidden",
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create('width', {
+  transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  overflowX: 'hidden',
+  overflowX: "hidden",
   width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
+  [theme.breakpoints.up("sm")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
 });
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
@@ -183,10 +188,10 @@ interface AppBarProps extends MuiAppBarProps {
 }
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
+  shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
+  transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
@@ -196,7 +201,7 @@ const AppBar = styled(MuiAppBar, {
       style: {
         marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
+        transition: theme.transitions.create(["width", "margin"], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.enteringScreen,
         }),
@@ -205,27 +210,27 @@ const AppBar = styled(MuiAppBar, {
   ],
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    variants: [
-      {
-        props: ({ open }) => open,
-        style: {
-          ...openedMixin(theme),
-          '& .MuiDrawer-paper': openedMixin(theme),
-        },
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  variants: [
+    {
+      props: ({ open }) => open,
+      style: {
+        ...openedMixin(theme),
+        "& .MuiDrawer-paper": openedMixin(theme),
       },
-      {
-        props: ({ open }) => !open,
-        style: {
-          ...closedMixin(theme),
-          '& .MuiDrawer-paper': closedMixin(theme),
-        },
+    },
+    {
+      props: ({ open }) => !open,
+      style: {
+        ...closedMixin(theme),
+        "& .MuiDrawer-paper": closedMixin(theme),
       },
-    ],
-  }),
-);
+    },
+  ],
+}));

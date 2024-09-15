@@ -1,15 +1,34 @@
-import { Box, Stack, Button, ButtonGroup, Skeleton, Grid2, Tooltip, Paper, IconButton, Switch, FormControlLabel, FormGroup } from '@mui/material'
-import React from 'react'
-import { Editor, OnMount } from '@monaco-editor/react';
-import * as monacoEditor from 'monaco-editor';
-import { DataObject, FormatPaint, PlaylistRemove } from '@mui/icons-material';
-import ExtraOptions from './ExtraOptions';
-import { defaultEditorValue } from '../common/Constants';
+import { Editor, OnMount } from "@monaco-editor/react";
+import { DataObject, FormatPaint, PlaylistRemove } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  FormControlLabel,
+  FormGroup,
+  Grid2,
+  IconButton,
+  Paper,
+  Skeleton,
+  Stack,
+  Switch,
+  Tooltip,
+} from "@mui/material";
+import * as monacoEditor from "monaco-editor";
+import React, { useState } from "react";
+import { defaultEditorValue } from "../../common/Constants";
+import ExtraOptions from "../features/ExtraOptions";
+import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
 
 export const JSONFormatter = () => {
+  // Snackbar Configuration
+  const [snackbarConfig, setSnackbarConfig] = useState<SnackbarConfig>({
+    open: false,
+  });
 
   // Correctly type the editorRef to be a monaco editor instance or null
-  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+  const editorRef =
+    React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
 
   const handleEditorDidMount: OnMount = (editor, _monaco) => {
     editorRef.current = editor;
@@ -18,9 +37,9 @@ export const JSONFormatter = () => {
   const removeNullValues = (json: any): any => {
     if (Array.isArray(json)) {
       return json
-        .map(item => removeNullValues(item))
-        .filter(item => item !== null);
-    } else if (json !== null && typeof json === 'object') {
+        .map((item) => removeNullValues(item))
+        .filter((item) => item !== null);
+    } else if (json !== null && typeof json === "object") {
       return Object.entries(json).reduce((acc, [key, value]) => {
         const cleanedValue = removeNullValues(value);
         if (cleanedValue !== null) {
@@ -37,7 +56,12 @@ export const JSONFormatter = () => {
       const unescapedString = JSON.parse(escapedJsonString);
       return JSON.parse(unescapedString);
     } catch (error) {
-      console.error("Invalid escaped JSON string:", error);
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Invalid escaped JSON string: ${error}`,
+        duration: 4000,
+      });
       return null;
     }
   };
@@ -45,7 +69,7 @@ export const JSONFormatter = () => {
   // Function to handle removing null values from the JSON in the editor
   const handleRemoveNullValues = () => {
     if (!editorRef.current) {
-      console.warn('Editor is not ready.');
+      console.warn("Editor is not ready.");
       return;
     }
 
@@ -55,15 +79,26 @@ export const JSONFormatter = () => {
       const parsedJson = JSON.parse(rawJson);
       const cleanedJson = removeNullValues(parsedJson);
       editorRef.current.setValue(JSON.stringify(cleanedJson, null, 2)); // Set cleaned JSON without formatting
+      setSnackbarConfig({
+        open: true,
+        severity: "success",
+        message: "Removed null values!",
+        duration: 2000,
+      });
     } catch (error) {
-      console.error("Invalid JSON:", error);
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Invalid JSON: ${error}`,
+        duration: 4000,
+      });
     }
   };
 
   // Function to handle unescaping an escaped JSON string and setting it in the editor
   const handleUnescapeJSON = () => {
     if (!editorRef.current) {
-      console.warn('Editor is not ready.');
+      console.warn("Editor is not ready.");
       return;
     }
 
@@ -72,30 +107,42 @@ export const JSONFormatter = () => {
 
     if (normalJson !== null) {
       editorRef.current.setValue(JSON.stringify(normalJson, null, 2)); // Optionally format the JSON
+      setSnackbarConfig({
+        open: true,
+        severity: "success",
+        message: "Unescaped JSON!",
+        duration: 2000,
+      });
     }
   };
 
   // Function to handle unescaping an escaped JSON string and setting it in the editor
   const handleEscapeJSON = () => {
     if (!editorRef.current) {
-      console.warn('Editor is not ready.');
+      console.warn("Editor is not ready.");
       return;
     }
 
     const jsonString = editorRef.current.getValue();
     editorRef.current.setValue(JSON.stringify(jsonString));
+    setSnackbarConfig({
+      open: true,
+      severity: "success",
+      message: "Escape JSON!",
+      duration: 2000,
+    });
   };
 
   const formatJSON = () => {
     if (!editorRef.current) {
-      console.warn('Editor is not ready.');
+      console.warn("Editor is not ready.");
       return;
     }
 
     const rawJson = editorRef.current.getValue(); // Get the raw JSON string
 
     if (!rawJson.trim()) {
-      console.warn('Editor content is empty.');
+      console.warn("Editor content is empty.");
       return;
     }
 
@@ -103,31 +150,52 @@ export const JSONFormatter = () => {
       const parsedJson = JSON.parse(rawJson); // Parse the JSON string to an object
       const prettyJson = JSON.stringify(parsedJson, null, 2); // Convert the object back to a pretty-printed JSON string
       editorRef.current.setValue(prettyJson); // Set the pretty-printed JSON in the editor
+      setSnackbarConfig({
+        open: true,
+        severity: "success",
+        message: "Formatted!",
+        duration: 2000,
+      });
     } catch (error) {
-      console.error("Invalid JSON:", error);
-      editorRef.current.setValue(rawJson); // Optionally, keep the raw content in the editor
-      // Optionally, you can display an error message in the UI if the JSON is invalid
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Invalid JSON: ${error}`,
+        duration: 4000,
+      });
+      editorRef.current.setValue(rawJson);
     }
   };
 
   const handleCopy = () => {
     if (!editorRef.current) {
-      console.warn('Editor is not ready.');
+      console.warn("Editor is not ready.");
       return;
     }
     const rawJson = editorRef.current.getValue();
-    navigator.clipboard.writeText(rawJson)
+    navigator.clipboard
+      .writeText(rawJson)
       .then(() => {
-        console.log('Text copied to clipboard');
+        setSnackbarConfig({
+          open: true,
+          severity: "info",
+          message: "Text copied to clipboard",
+          duration: 2000,
+        });
       })
       .catch((err) => {
-        console.error('Failed to copy text: ', err);
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Failed to copy text: ${err}`,
+          duration: 4000,
+        });
       });
   };
 
   const handleSave = async () => {
     if (!editorRef.current) {
-      console.warn('Editor is not ready.');
+      console.warn("Editor is not ready.");
       return;
     }
     const data = editorRef.current.getValue();
@@ -136,12 +204,14 @@ export const JSONFormatter = () => {
     try {
       // Request file handle from user
       const fileHandle = await window.showSaveFilePicker({
-        types: [{
-          description: 'JSON Files',
-          accept: {
-            'application/json': ['.json'],
+        types: [
+          {
+            description: "JSON Files",
+            accept: {
+              "application/json": [".json"],
+            },
           },
-        }],
+        ],
       });
 
       // Create a writable stream
@@ -152,10 +222,13 @@ export const JSONFormatter = () => {
 
       // Close the stream
       await writable.close();
-
     } catch (err) {
-      console.error('Error saving file:', err);
-      // Handle error appropriately (e.g., display an error message to the user)
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Error saving file: ${err}`,
+        duration: 4000,
+      });
     }
   };
 
@@ -169,7 +242,14 @@ export const JSONFormatter = () => {
     actionDesc: string;
     actionIcon: React.ReactNode;
     actionHandler: () => void;
-    actionColor?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
+    actionColor?:
+      | "inherit"
+      | "primary"
+      | "secondary"
+      | "success"
+      | "error"
+      | "info"
+      | "warning";
   }
 
   // Define the actionList with correct typing
@@ -179,29 +259,29 @@ export const JSONFormatter = () => {
       actionDesc: "Format JSON",
       actionIcon: <DataObject />,
       actionHandler: formatJSON,
-      actionColor: 'primary'  // valid color
+      actionColor: "primary", // valid color
     },
     {
       actionName: "Remove Null",
       actionDesc: "Remove Null Values",
       actionIcon: <PlaylistRemove />,
       actionHandler: handleRemoveNullValues,
-      actionColor: 'error'  // valid color
+      actionColor: "error", // valid color
     },
     {
       actionName: "Unescape",
       actionDesc: "Remove Escape Characters",
       actionIcon: <FormatPaint />,
       actionHandler: handleUnescapeJSON,
-      actionColor: 'warning'  // valid color
+      actionColor: "warning", // valid color
     },
     {
       actionName: "Escape",
       actionDesc: "Escape Meta Characters",
       actionIcon: <FormatPaint />,
       actionHandler: handleEscapeJSON,
-      actionColor: 'success'  // valid color
-    }
+      actionColor: "success", // valid color
+    },
   ];
 
   // Map the actionList to JSX elements
@@ -210,7 +290,7 @@ export const JSONFormatter = () => {
       <Button
         startIcon={action.actionIcon}
         aria-label={action.actionDesc}
-        color={action.actionColor || 'inherit'}  // Use a valid color
+        color={action.actionColor || "inherit"} // Use a valid color
         onClick={action.actionHandler}
       >
         {action.actionName}
@@ -222,8 +302,9 @@ export const JSONFormatter = () => {
     <Tooltip key={index} title={action.actionDesc}>
       <IconButton
         aria-label={action.actionDesc}
-        color={action.actionColor || 'inherit'}
-        onClick={action.actionHandler}>
+        color={action.actionColor || "inherit"}
+        onClick={action.actionHandler}
+      >
         {action.actionIcon}
       </IconButton>
     </Tooltip>
@@ -252,7 +333,12 @@ export const JSONFormatter = () => {
                 </ButtonGroup>
                 <Tooltip title="Button Label?">
                   <FormGroup>
-                    <FormControlLabel control={<Switch onChange={handleChange} checked={isLabeled} />} label="" />
+                    <FormControlLabel
+                      control={
+                        <Switch onChange={handleChange} checked={isLabeled} />
+                      }
+                      label=""
+                    />
                   </FormGroup>
                 </Tooltip>
               </Stack>
@@ -260,7 +346,7 @@ export const JSONFormatter = () => {
             <Stack direction="row">
               <Box sx={{ flexGrow: 1, height: "70vh" }}>
                 <Editor
-                  theme='vs-dark'
+                  theme="vs-dark"
                   defaultLanguage="json"
                   loading={<Skeleton variant="rounded" animation="wave" />}
                   defaultValue={defaultEditorValue}
@@ -271,6 +357,10 @@ export const JSONFormatter = () => {
           </Stack>
         </Grid2>
       </Grid2>
+      <SnackbarAlert
+        snackbarConfig={snackbarConfig}
+        setSnackbarConfig={setSnackbarConfig}
+      />
     </Box>
-  )
-}
+  );
+};
