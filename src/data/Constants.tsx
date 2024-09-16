@@ -141,3 +141,53 @@ export const supportedLanguages = [
   "aes", // Advanced Encryption Standard
   "ecl", // ECL (Enterprise Control Language)
 ];
+
+export const jsonPathHelpData = [
+  { xpath: "/", jsonpath: "$", description: "the root object/element" },
+  { xpath: ".", jsonpath: "@", description: "the current object/element" },
+  { xpath: "/", jsonpath: ". or []", description: "child operator" },
+  { xpath: "..", jsonpath: "n/a", description: "parent operator" },
+  {
+    xpath: "//",
+    jsonpath: "..",
+    description: "recursive descent. JSONPath borrows this syntax from E4X.",
+  },
+  {
+    xpath: "*",
+    jsonpath: "*",
+    description: "wildcard. All objects/elements regardless their names.",
+  },
+  {
+    xpath: "@",
+    jsonpath: "n/a",
+    description: "attribute access. JSON structures don't have attributes.",
+  },
+  {
+    xpath: "[]",
+    jsonpath: "[]",
+    description:
+      "subscript operator. XPath uses it to iterate over element collections and for predicates. In Javascript and JSON it is the native array operator.",
+  },
+  {
+    xpath: "|",
+    jsonpath: "[,]",
+    description:
+      "Union operator in XPath results in a combination of node sets. JSONPath allows alternate names or array indices as a set.",
+  },
+  {
+    xpath: "n/a",
+    jsonpath: "[start:end:step]",
+    description: "array slice operator borrowed from ES4.",
+  },
+  {
+    xpath: "[]",
+    jsonpath: "?()",
+    description: "applies a filter (script) expression.",
+  },
+  {
+    xpath: "n/a",
+    jsonpath: "()",
+    description: "script expression, using the underlying script engine.",
+  },
+  { xpath: "()", jsonpath: "n/a", description: "grouping in Xpath" },
+];

@@ -1,5 +1,5 @@
 import { Editor, OnMount } from "@monaco-editor/react";
-import { Close, ContentCopy, Done, Help, Search } from "@mui/icons-material";
+import { Close, ContentCopy, Done, Help } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -24,7 +24,8 @@ import { JsonData, JsonEditor } from "json-edit-react";
 import { JSONPath } from "jsonpath-plus";
 import * as monacoEditor from "monaco-editor";
 import React, { useEffect, useState } from "react";
-import { defaultEditorValue } from "../../common/Constants";
+import { defaultEditorValue, jsonPathHelpData } from "../../data/Constants";
+import { jsonEditorCustomTheme } from "../../data/Themes";
 import ExtraOptions from "../features/ExtraOptions";
 import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
 
@@ -88,6 +89,27 @@ export const JSONPathUtility = () => {
     toggleHelp(false);
   }
 
+  const handleCopyExpression = () => {
+    navigator.clipboard
+      .writeText(pathValue)
+      .then(() => {
+        setSnackbarConfig({
+          open: true,
+          severity: "info",
+          message: "Expression Copied!",
+          duration: 2000,
+        });
+      })
+      .catch((err) => {
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Failed to copy text: ${err}`,
+          duration: 4000,
+        });
+      });
+  };
+
   // Snackbar Configuration
   const [snackbarConfig, setSnackbarConfig] = useState<SnackbarConfig>({
     open: false,
@@ -109,16 +131,19 @@ export const JSONPathUtility = () => {
                 }}
               >
                 <ExtraOptions />
+                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                 <InputBase
                   sx={{ ml: 1, flex: 1 }}
+                  required
                   placeholder="JSON Path Evaluate"
                   value={pathValue}
                   onChange={handleInputChange}
+                  fullWidth
                   inputProps={{ "aria-label": "json path evaluate" }}
                 />
-                <Tooltip title="Evaluate">
-                  <IconButton onClick={handleEvaluate}>
-                    <Search />
+                <Tooltip title="Copy Expression">
+                  <IconButton onClick={handleCopyExpression}>
+                    <ContentCopy />
                   </IconButton>
                 </Tooltip>
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
@@ -129,7 +154,7 @@ export const JSONPathUtility = () => {
                     sx={{ p: "10px" }}
                     aria-label="search"
                   >
-                    <Help />
+                    <Help color="primary" />
                   </IconButton>
                 </Tooltip>
               </Paper>
@@ -156,7 +181,7 @@ export const JSONPathUtility = () => {
                     ok: <Done />,
                     cancel: <Close />,
                   }}
-                  theme="monoDark"
+                  theme={jsonEditorCustomTheme}
                   data={outputJSON}
                 />
               </Grid2>
@@ -198,7 +223,7 @@ export const JSONPathUtility = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {helpTableRows.map((row, index) => (
+                {jsonPathHelpData.map((row, index) => (
                   <TableRow
                     key={index}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -222,56 +247,6 @@ export const JSONPathUtility = () => {
     </Box>
   );
 };
-
-const helpTableRows = [
-  { xpath: "/", jsonpath: "$", description: "the root object/element" },
-  { xpath: ".", jsonpath: "@", description: "the current object/element" },
-  { xpath: "/", jsonpath: ". or []", description: "child operator" },
-  { xpath: "..", jsonpath: "n/a", description: "parent operator" },
-  {
-    xpath: "//",
-    jsonpath: "..",
-    description: "recursive descent. JSONPath borrows this syntax from E4X.",
-  },
-  {
-    xpath: "*",
-    jsonpath: "*",
-    description: "wildcard. All objects/elements regardless their names.",
-  },
-  {
-    xpath: "@",
-    jsonpath: "n/a",
-    description: "attribute access. JSON structures don't have attributes.",
-  },
-  {
-    xpath: "[]",
-    jsonpath: "[]",
-    description:
-      "subscript operator. XPath uses it to iterate over element collections and for predicates. In Javascript and JSON it is the native array operator.",
-  },
-  {
-    xpath: "|",
-    jsonpath: "[,]",
-    description:
-      "Union operator in XPath results in a combination of node sets. JSONPath allows alternate names or array indices as a set.",
-  },
-  {
-    xpath: "n/a",
-    jsonpath: "[start:end:step]",
-    description: "array slice operator borrowed from ES4.",
-  },
-  {
-    xpath: "[]",
-    jsonpath: "?()",
-    description: "applies a filter (script) expression.",
-  },
-  {
-    xpath: "n/a",
-    jsonpath: "()",
-    description: "script expression, using the underlying script engine.",
-  },
-  { xpath: "()", jsonpath: "n/a", description: "grouping in Xpath" },
-];
 
 const modalStyle = {
   position: "absolute" as "absolute",

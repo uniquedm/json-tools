@@ -5,11 +5,11 @@ import {
   Delete,
   Done,
   Edit,
+  FormatListNumberedRtl,
 } from "@mui/icons-material";
 import {
   Box,
-  FormControl,
-  FormLabel,
+  Divider,
   Grid2,
   Paper,
   Slider,
@@ -17,10 +17,12 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { JsonEditor } from "json-edit-react";
 import React from "react";
-import { defaultEditorJSON } from "../../common/Constants";
+import { defaultEditorJSON } from "../../data/Constants";
+import { jsonEditorCustomTheme } from "../../data/Themes";
 import ExtraOptions from "../features/ExtraOptions";
 
 interface JSONEditAction {
@@ -65,6 +67,7 @@ export const JSONTreeViewer = () => {
   };
 
   const [collapseLevel, setCollapseLevel] = React.useState<number>(1);
+  const [showCount, toggleShowCount] = React.useState<boolean>(false);
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -74,18 +77,19 @@ export const JSONTreeViewer = () => {
             <Paper>
               <Stack sx={{ m: 1 }} spacing={2} direction="row">
                 <ExtraOptions />
+                <Divider orientation="vertical" flexItem />
                 <ToggleButtonGroup
                   value={options}
                   onChange={handleDevices}
                   aria-label="device"
                   size="small"
+                  sx={{ height: 40 }}
                 >
                   {toggleList}
                 </ToggleButtonGroup>
-                <FormControl>
-                  <FormLabel id="collapse-level-slider-label">
-                    Collapse Level
-                  </FormLabel>
+                <Divider orientation="vertical" flexItem />
+                <Stack spacing={-2}>
+                  <Typography variant="overline">Collapse Level</Typography>
                   <Slider
                     size="small"
                     sx={{ color: "inherit" }}
@@ -103,7 +107,19 @@ export const JSONTreeViewer = () => {
                     min={0}
                     max={10}
                   />
-                </FormControl>
+                </Stack>
+                <Divider orientation="vertical" flexItem />
+                <Tooltip title="Show Item Count?">
+                  <ToggleButton
+                    value="check"
+                    selected={showCount}
+                    onChange={() => {
+                      toggleShowCount(!showCount);
+                    }}
+                  >
+                    <FormatListNumberedRtl />
+                  </ToggleButton>
+                </Tooltip>
               </Stack>
             </Paper>
           </Stack>
@@ -111,6 +127,7 @@ export const JSONTreeViewer = () => {
       </Grid2>
       <Box sx={{ mt: 2, flexGrow: 1 }}>
         <JsonEditor
+          showCollectionCount={showCount}
           collapse={collapseLevel}
           enableClipboard
           icons={{
@@ -124,7 +141,7 @@ export const JSONTreeViewer = () => {
           restrictEdit={!options.includes("Edit")}
           restrictAdd={!options.includes("Add")}
           restrictDelete={!options.includes("Delete")}
-          theme="monoDark"
+          theme={jsonEditorCustomTheme}
           data={defaultEditorJSON}
         />
       </Box>

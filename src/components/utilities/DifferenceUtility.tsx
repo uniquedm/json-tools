@@ -1,6 +1,7 @@
 import { DiffEditor } from "@monaco-editor/react";
 import {
   Box,
+  Divider,
   FormControl,
   Grid2,
   MenuItem,
@@ -15,7 +16,7 @@ import {
   defaultEditorValue,
   defaultModifiedValue,
   supportedLanguages,
-} from "../../common/Constants";
+} from "../../data/Constants";
 import ExtraOptions from "../features/ExtraOptions";
 
 export const DifferenceUtility = () => {
@@ -39,6 +40,7 @@ export const DifferenceUtility = () => {
             <Paper>
               <Stack sx={{ m: 1 }} spacing={2} direction="row">
                 <ExtraOptions />
+                <Divider orientation="vertical" flexItem />
                 <FormControl size="small">
                   {" "}
                   <Select

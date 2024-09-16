@@ -1,11 +1,15 @@
 import { Editor, OnMount } from "@monaco-editor/react";
-import { DataObject, FormatPaint, PlaylistRemove } from "@mui/icons-material";
+import {
+  DataObject,
+  FormatPaint,
+  PlaylistRemove,
+  ReadMore,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
   ButtonGroup,
-  FormControlLabel,
-  FormGroup,
+  Divider,
   Grid2,
   IconButton,
   Paper,
@@ -13,10 +17,11 @@ import {
   Stack,
   Switch,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import * as monacoEditor from "monaco-editor";
 import React, { useState } from "react";
-import { defaultEditorValue } from "../../common/Constants";
+import { defaultEditorValue } from "../../data/Constants";
 import ExtraOptions from "../features/ExtraOptions";
 import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
 
@@ -322,25 +327,32 @@ export const JSONFormatter = () => {
         <Grid2 size={12}>
           <Stack spacing={2} direction="column">
             <Paper>
-              <Stack sx={{ m: 1 }} spacing={2} direction="row">
+              <Stack sx={{ m: 1 }} spacing={1} direction="row">
                 <ExtraOptions
                   handleCopy={handleCopy}
                   handlePrint={handlePrint}
                   handleSave={handleSave}
                 />
+                <Divider orientation="vertical" flexItem />
+                <Stack direction={"column"}>
+                  <Stack direction={"row"}>
+                    <ReadMore fontSize="small" />
+                    <Typography variant="overline" fontSize={8}>
+                      LABELS
+                    </Typography>
+                  </Stack>
+                  <Tooltip title="Button Label?">
+                    <Switch
+                      size="small"
+                      onChange={handleChange}
+                      checked={isLabeled}
+                    />
+                  </Tooltip>
+                </Stack>
+                <Divider orientation="vertical" flexItem />
                 <ButtonGroup variant="text" size="small">
                   {isLabeled ? actionButtons : actionIconButtons}
                 </ButtonGroup>
-                <Tooltip title="Button Label?">
-                  <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Switch onChange={handleChange} checked={isLabeled} />
-                      }
-                      label=""
-                    />
-                  </FormGroup>
-                </Tooltip>
               </Stack>
             </Paper>
             <Stack direction="row">

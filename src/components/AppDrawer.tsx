@@ -17,8 +17,8 @@ import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { ThemeInput } from "../common/Themes";
-import { extraUtilities, mainUtilities, Utility } from "../common/Utilities";
+import { ThemeInput } from "../data/Themes";
+import { extraUtilities, mainUtilities, Utility } from "../data/Utilities";
 import DarkModeSwitch from "./features/DarkModeSwitch";
 import GithubStarCount from "./features/GithubStarCount";
 

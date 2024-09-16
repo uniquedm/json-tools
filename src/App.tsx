@@ -3,8 +3,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 import { Route, HashRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
-import { darkTheme } from "./common/Themes";
 import AppDrawer from "./components/AppDrawer";
+import { darkTheme } from "./data/Themes";
 
 function Home() {
   const [theme, setTheme] = useState(darkTheme);
