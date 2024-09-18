@@ -1,20 +1,22 @@
-import * as React from "react";
-import { styled, alpha } from "@mui/material/styles";
+import { FileOpen, MoreVert } from "@mui/icons-material";
+import FileCopyIcon from "@mui/icons-material/FileCopyOutlined";
+import PrintIcon from "@mui/icons-material/Print";
+import SaveIcon from "@mui/icons-material/Save";
+import { IconButton, Tooltip } from "@mui/material";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { MoreVert } from "@mui/icons-material";
-import { Tooltip, IconButton } from "@mui/material";
-import FileCopyIcon from "@mui/icons-material/FileCopyOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import PrintIcon from "@mui/icons-material/Print";
+import { alpha, styled } from "@mui/material/styles";
+import * as React from "react";
 
 interface SpeedDialButtonProps {
+  handleFileLoad?: () => void;
   handleCopy?: () => void;
   handleSave?: () => void;
   handlePrint?: () => void;
 }
 
 export default function ExtraOptions({
+  handleFileLoad,
   handleCopy,
   handleSave,
   handlePrint,
@@ -35,6 +37,7 @@ export default function ExtraOptions({
   }
 
   const actions: Action[] = [
+    { icon: <FileOpen />, name: "Load", onClick: handleFileLoad },
     { icon: <FileCopyIcon />, name: "Copy", onClick: handleCopy },
     { icon: <SaveIcon />, name: "Save", onClick: handleSave },
     { icon: <PrintIcon />, name: "Print", onClick: handlePrint },

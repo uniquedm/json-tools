@@ -24,12 +24,21 @@ import { JsonData, JsonEditor } from "json-edit-react";
 import { JSONPath } from "jsonpath-plus";
 import * as monacoEditor from "monaco-editor";
 import React, { useEffect, useState } from "react";
-import { defaultEditorValue, jsonPathHelpData } from "../../data/Constants";
-import { jsonEditorCustomTheme } from "../../data/Themes";
+import { jsonPathHelpData } from "../../data/Constants";
+import { defaultEditorJSON, defaultEditorValue } from "../../data/Defaults";
+import { UtilityProps } from "../../data/DrawerData";
+import {
+  darkTheme,
+  jsonEditCustomDarkTheme,
+  jsonEditCustomTheme,
+} from "../../data/Themes";
 import ExtraOptions from "../features/ExtraOptions";
 import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
 
-export const JSONPathUtility = () => {
+export const JSONPathUtility: React.FC<UtilityProps> = ({
+  editorData = defaultEditorJSON,
+  theme = darkTheme,
+}) => {
   // Initialize state for the input value
   const [pathValue, setPathValue] = useState("$.objectField.nestedObject");
 
@@ -163,10 +172,10 @@ export const JSONPathUtility = () => {
               <Grid2 size={6}>
                 <Editor
                   height={"70vh"}
-                  theme="vs-dark"
+                  theme={theme === darkTheme ? "vs-dark" : "light"}
                   defaultLanguage="json"
                   loading={<Skeleton variant="rounded" animation="wave" />}
-                  defaultValue={defaultEditorValue}
+                  defaultValue={JSON.stringify(editorData, null, 2)}
                   onMount={handleEditorDidMount}
                 />
               </Grid2>
@@ -181,7 +190,11 @@ export const JSONPathUtility = () => {
                     ok: <Done />,
                     cancel: <Close />,
                   }}
-                  theme={jsonEditorCustomTheme}
+                  theme={
+                    theme === darkTheme
+                      ? jsonEditCustomDarkTheme
+                      : jsonEditCustomTheme
+                  }
                   data={outputJSON}
                 />
               </Grid2>

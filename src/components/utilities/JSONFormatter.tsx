@@ -1,9 +1,13 @@
 import { Editor, OnMount } from "@monaco-editor/react";
 import {
+  AutoFixHigh,
+  Compress,
   DataObject,
   FormatPaint,
   PlaylistRemove,
   ReadMore,
+  SortByAlpha,
+  SwapVert,
 } from "@mui/icons-material";
 import {
   Box,
@@ -19,13 +23,21 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { jsonrepair } from "jsonrepair";
 import * as monacoEditor from "monaco-editor";
 import React, { useState } from "react";
-import { defaultEditorValue } from "../../data/Constants";
+import { defaultEditorJSON } from "../../data/Defaults";
+import { UtilityProps } from "../../data/DrawerData";
+import { darkTheme } from "../../data/Themes";
 import ExtraOptions from "../features/ExtraOptions";
 import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
 
-export const JSONFormatter = () => {
+export const JSONFormatter: React.FC<UtilityProps> = ({
+  editorData = defaultEditorJSON,
+  setEditorData,
+  theme = darkTheme,
+}) => {
+  const editorTheme = theme === darkTheme ? "vs-dark" : "light";
   // Snackbar Configuration
   const [snackbarConfig, setSnackbarConfig] = useState<SnackbarConfig>({
     open: false,
@@ -100,6 +112,35 @@ export const JSONFormatter = () => {
     }
   };
 
+  // Function to handle removing null values from the JSON in the editor
+  const handleRepairValues = () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    const rawJson = editorRef.current.getValue();
+
+    try {
+      const repairedJson = jsonrepair(rawJson);
+      const parsedJson = JSON.parse(repairedJson);
+      editorRef.current.setValue(JSON.stringify(parsedJson, null, 2)); // Set cleaned JSON without formatting
+      setSnackbarConfig({
+        open: true,
+        severity: "success",
+        message: "Repaired JSON!",
+        duration: 2000,
+      });
+    } catch (error) {
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Invalid JSON: ${error}`,
+        duration: 4000,
+      });
+    }
+  };
+
   // Function to handle unescaping an escaped JSON string and setting it in the editor
   const handleUnescapeJSON = () => {
     if (!editorRef.current) {
@@ -138,7 +179,41 @@ export const JSONFormatter = () => {
     });
   };
 
-  const formatJSON = () => {
+  const handleCompactJSON = () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    const rawJson = editorRef.current.getValue(); // Get the raw JSON string
+
+    if (!rawJson.trim()) {
+      console.warn("Editor content is empty.");
+      return;
+    }
+
+    try {
+      const parsedJson = JSON.parse(rawJson); // Parse the JSON string to an object
+      const prettyJson = JSON.stringify(parsedJson, null, 0); // Convert the object back to a compacted JSON string
+      editorRef.current.setValue(prettyJson); // Set the pretty-printed JSON in the editor
+      setSnackbarConfig({
+        open: true,
+        severity: "success",
+        message: "Compacted!",
+        duration: 2000,
+      });
+    } catch (error) {
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Invalid JSON: ${error}`,
+        duration: 4000,
+      });
+      editorRef.current.setValue(rawJson);
+    }
+  };
+
+  const handleFormatJSON = () => {
     if (!editorRef.current) {
       console.warn("Editor is not ready.");
       return;
@@ -168,6 +243,146 @@ export const JSONFormatter = () => {
         message: `Invalid JSON: ${error}`,
         duration: 4000,
       });
+      editorRef.current.setValue(rawJson);
+    }
+  };
+
+  const handleSortJSON = () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    const rawJson = editorRef.current.getValue(); // Get the raw JSON string
+
+    if (!rawJson.trim()) {
+      console.warn("Editor content is empty.");
+      return;
+    }
+
+    try {
+      // Parse the JSON string into an object and assert it has string keys and any values
+      const parsedJson = JSON.parse(rawJson) as Record<string, any>;
+
+      // Check if the parsed JSON is an object (can only sort keys of an object)
+      if (
+        typeof parsedJson === "object" &&
+        parsedJson !== null &&
+        !Array.isArray(parsedJson)
+      ) {
+        // Sort the keys of the object alphabetically
+        const sortedJson = Object.keys(parsedJson)
+          .sort() // Sort the keys array
+          .reduce((acc: Record<string, any>, key: string) => {
+            acc[key] = parsedJson[key]; // Rebuild the object with sorted keys
+            return acc;
+          }, {});
+
+        // Convert the sorted object back to a pretty-printed JSON string
+        const prettyJson = JSON.stringify(sortedJson, null, 2); // 2 spaces for formatting
+
+        // Set the sorted JSON in the editor
+        editorRef.current.setValue(prettyJson);
+
+        // Show success message
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "JSON sorted alphabetically!",
+          duration: 2000,
+        });
+      } else {
+        // If it's not an object, show a warning
+        console.warn(
+          "JSON is not an object. Sorting is only applicable to objects."
+        );
+        setSnackbarConfig({
+          open: true,
+          severity: "warning",
+          message: "Sorting only applies to JSON objects.",
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      // Handle errors (e.g., invalid JSON)
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Invalid JSON: ${error}`,
+        duration: 4000,
+      });
+
+      // Optionally, set the original raw JSON back in the editor in case of error
+      editorRef.current.setValue(rawJson);
+    }
+  };
+
+  const handleReverseJSON = () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    const rawJson = editorRef.current.getValue(); // Get the raw JSON string
+
+    if (!rawJson.trim()) {
+      console.warn("Editor content is empty.");
+      return;
+    }
+
+    try {
+      // Parse the JSON string into an object and assert it has string keys and any values
+      const parsedJson = JSON.parse(rawJson) as Record<string, any>;
+
+      // Check if the parsed JSON is an object (can only reverse keys of an object)
+      if (
+        typeof parsedJson === "object" &&
+        parsedJson !== null &&
+        !Array.isArray(parsedJson)
+      ) {
+        // Get the keys, reverse them, and reduce them back into an object
+        const reversedJson = Object.keys(parsedJson)
+          .reverse() // Reverse the order of keys
+          .reduce((acc: Record<string, any>, key: string) => {
+            acc[key] = parsedJson[key]; // Rebuild the object with reversed keys
+            return acc;
+          }, {});
+
+        // Convert the reversed object back to a pretty-printed JSON string
+        const prettyJson = JSON.stringify(reversedJson, null, 2); // 2 spaces for formatting
+
+        // Set the reversed JSON in the editor
+        editorRef.current.setValue(prettyJson);
+
+        // Show success message
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "JSON keys reversed!",
+          duration: 2000,
+        });
+      } else {
+        // If it's not an object, show a warning
+        console.warn(
+          "JSON is not an object. Reversing is only applicable to objects."
+        );
+        setSnackbarConfig({
+          open: true,
+          severity: "warning",
+          message: "Reversing only applies to JSON objects.",
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      // Handle errors (e.g., invalid JSON)
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Invalid JSON: ${error}`, // Use error.message for a cleaner message
+        duration: 4000,
+      });
+
+      // Optionally, set the original raw JSON back in the editor in case of error
       editorRef.current.setValue(rawJson);
     }
   };
@@ -237,6 +452,65 @@ export const JSONFormatter = () => {
     }
   };
 
+  const handleLoadFile = async () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    try {
+      // Request file handle from the user
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [
+          {
+            description: "JSON Files",
+            accept: {
+              "application/json": [".json"],
+            },
+          },
+        ],
+        multiple: false, // Only allow loading one file
+      });
+
+      // Get the file object from the file handle
+      const file = await fileHandle.getFile();
+
+      // Read the file contents as text
+      const fileContent = await file.text();
+
+      // Parse the file content and set it in the editor
+      try {
+        const parsedJson = JSON.parse(fileContent); // Ensure it's valid JSON
+
+        // Set the loaded JSON in the editor
+        editorRef.current.setValue(JSON.stringify(parsedJson, null, 2)); // Pretty print with 2 spaces
+        if (setEditorData) setEditorData(parsedJson);
+
+        // Show success message
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "JSON file loaded successfully!",
+          duration: 2000,
+        });
+      } catch (parseError) {
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: "Invalid JSON file. Please check the file content.",
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      setSnackbarConfig({
+        open: true,
+        severity: "error",
+        message: `Error loading file: ${error}`,
+        duration: 4000,
+      });
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -260,32 +534,60 @@ export const JSONFormatter = () => {
   // Define the actionList with correct typing
   const actionList: Action[] = [
     {
+      actionName: "Compact",
+      actionDesc: "Compact JSON",
+      actionIcon: <Compress />,
+      actionHandler: handleCompactJSON,
+      actionColor: "primary",
+    },
+    {
       actionName: "Format",
       actionDesc: "Format JSON",
       actionIcon: <DataObject />,
-      actionHandler: formatJSON,
-      actionColor: "primary", // valid color
+      actionHandler: handleFormatJSON,
+      actionColor: "primary",
+    },
+    {
+      actionName: "Sort",
+      actionDesc: "Sort JSON",
+      actionIcon: <SortByAlpha />,
+      actionHandler: handleSortJSON,
+      actionColor: "secondary",
+    },
+    {
+      actionName: "Reverse",
+      actionDesc: "Reverse JSON",
+      actionIcon: <SwapVert />,
+      actionHandler: handleReverseJSON,
+      actionColor: "secondary",
     },
     {
       actionName: "Remove Null",
       actionDesc: "Remove Null Values",
       actionIcon: <PlaylistRemove />,
       actionHandler: handleRemoveNullValues,
-      actionColor: "error", // valid color
+      actionColor: "error",
+    },
+    {
+      actionName: "Repair",
+      actionDesc: "Repair JSON",
+      actionIcon: <AutoFixHigh />,
+      actionHandler: handleRepairValues,
+      actionColor: "warning",
     },
     {
       actionName: "Unescape",
       actionDesc: "Remove Escape Characters",
       actionIcon: <FormatPaint />,
       actionHandler: handleUnescapeJSON,
-      actionColor: "warning", // valid color
+      actionColor: "warning",
     },
     {
       actionName: "Escape",
       actionDesc: "Escape Meta Characters",
       actionIcon: <FormatPaint />,
       actionHandler: handleEscapeJSON,
-      actionColor: "success", // valid color
+      actionColor: "success",
     },
   ];
 
@@ -293,10 +595,13 @@ export const JSONFormatter = () => {
   const actionButtons = actionList.map((action, index) => (
     <Tooltip key={index} title={action.actionDesc}>
       <Button
+        size="small"
+        variant="contained"
         startIcon={action.actionIcon}
         aria-label={action.actionDesc}
         color={action.actionColor || "inherit"} // Use a valid color
         onClick={action.actionHandler}
+        sx={{}}
       >
         {action.actionName}
       </Button>
@@ -315,7 +620,7 @@ export const JSONFormatter = () => {
     </Tooltip>
   ));
 
-  const [isLabeled, toggleLabel] = React.useState(false);
+  const [isLabeled, toggleLabel] = React.useState(true);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     toggleLabel(event.target.checked);
@@ -329,6 +634,7 @@ export const JSONFormatter = () => {
             <Paper>
               <Stack sx={{ m: 1 }} spacing={1} direction="row">
                 <ExtraOptions
+                  handleFileLoad={handleLoadFile}
                   handleCopy={handleCopy}
                   handlePrint={handlePrint}
                   handleSave={handleSave}
@@ -358,10 +664,10 @@ export const JSONFormatter = () => {
             <Stack direction="row">
               <Box sx={{ flexGrow: 1, height: "70vh" }}>
                 <Editor
-                  theme="vs-dark"
+                  theme={editorTheme}
                   defaultLanguage="json"
                   loading={<Skeleton variant="rounded" animation="wave" />}
-                  defaultValue={defaultEditorValue}
+                  defaultValue={JSON.stringify(editorData, null, 2)}
                   onMount={handleEditorDidMount}
                 />
               </Box>

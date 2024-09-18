@@ -12,14 +12,15 @@ import {
   Stack,
 } from "@mui/material";
 import React from "react";
-import {
-  defaultEditorValue,
-  defaultModifiedValue,
-  supportedLanguages,
-} from "../../data/Constants";
+import { supportedLanguages } from "../../data/Constants";
+import { defaultEditorValue, defaultModifiedValue } from "../../data/Defaults";
+import { UtilityProps } from "../../data/DrawerData";
+import { darkTheme } from "../../data/Themes";
 import ExtraOptions from "../features/ExtraOptions";
 
-export const DifferenceUtility = () => {
+export const DifferenceUtility: React.FC<UtilityProps> = ({
+  theme = darkTheme,
+}) => {
   const [editorLanguage, setEditorLanguage] = React.useState("json");
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -27,7 +28,7 @@ export const DifferenceUtility = () => {
   };
 
   const languageMenu = supportedLanguages.map((languageName) => (
-    <MenuItem sx={{}} value={languageName}>
+    <MenuItem key={languageName} value={languageName}>
       {languageName}
     </MenuItem>
   ));
@@ -60,7 +61,7 @@ export const DifferenceUtility = () => {
       <Box sx={{ mt: 2 }}>
         <DiffEditor
           language={editorLanguage}
-          theme="vs-dark"
+          theme={theme === darkTheme ? "vs-dark" : "light"}
           original={defaultEditorValue}
           modified={defaultModifiedValue}
           options={{

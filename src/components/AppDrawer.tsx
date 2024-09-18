@@ -1,3 +1,10 @@
+import {
+  AccountTree,
+  DataObject,
+  Difference,
+  ManageSearch,
+  Security,
+} from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -17,16 +24,83 @@ import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { Utility } from "../data/DrawerData";
 import { ThemeInput } from "../data/Themes";
-import { extraUtilities, mainUtilities, Utility } from "../data/Utilities";
 import DarkModeSwitch from "./features/DarkModeSwitch";
 import GithubStarCount from "./features/GithubStarCount";
+import { DifferenceUtility } from "./utilities/DifferenceUtility";
+import { JSONFormatter } from "./utilities/JSONFormatter";
+import { JSONPathUtility } from "./utilities/JSONPathUtility";
+import { JSONTreeViewer } from "./utilities/JSONTreeViewer";
+import { JWTUtility } from "./utilities/JWTUtility";
+
+const mainUtilities: { [key: string]: Utility } = {
+  FORMAT: {
+    component: <JSONFormatter />,
+    navIcon: <DataObject />,
+    isOpen: true,
+    tooltip: "Formatting Utilities",
+    toolName: "JSON Formatter",
+    // props: {
+    //   editorData: editorData,
+    //   setEditorData: setEditorData,
+    //   theme: appTheme,
+    // },
+  },
+  TREEVIEW: {
+    component: <JSONTreeViewer />,
+    navIcon: <AccountTree />,
+    isOpen: false,
+    // props: {
+    //   editorData: editorData,
+    //   theme: appTheme,
+    // },
+    tooltip: "JSON Tree",
+    toolName: "JSON Tree",
+  },
+  JPATH: {
+    component: <JSONPathUtility />,
+    navIcon: <ManageSearch />,
+    isOpen: false,
+    // props: {
+    //   editorData: editorData,
+    //   theme: appTheme,
+    // },
+    tooltip: "JSON Path Evaluation",
+    toolName: "JSON Path Evaluator",
+  },
+};
+
+const extraUtilities: { [key: string]: Utility } = {
+  DIFFERENCE: {
+    component: <DifferenceUtility />,
+    navIcon: <Difference />,
+    isOpen: false,
+    // props: {
+    //   theme: appTheme,
+    // },
+    tooltip: "Data Difference Utility",
+    toolName: "Difference Checker",
+  },
+  JWTDECODE: {
+    component: <JWTUtility />,
+    navIcon: <Security />,
+    isOpen: false,
+    // props: {
+    //   theme: appTheme,
+    // },
+    tooltip: "JWT Decoder",
+    toolName: "JWT Decoder",
+  },
+};
 
 export default function AppDrawer({ setTheme }: ThemeInput) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  // const [editorData, setEditorData] = React.useState(defaultEditorJSON);
+
   const [currentUtility, setCurrentUtility] = React.useState(
-    mainUtilities["FORMAT"]
+    mainUtilities.FORMAT
   );
 
   const handleDrawerOpen = () => {
@@ -41,12 +115,19 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
     return (
       <List>
         {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
-          <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
+          <ListItem
+            key={utilityDetails.toolName}
+            disablePadding
+            sx={{ display: "block" }}
+          >
             <ListItemButton
               onClick={() => {
                 currentUtility["isOpen"] = false;
                 utilityDetails["isOpen"] = true;
                 setCurrentUtility(utilityDetails);
+                console.log(utilityDetails);
+                console.log(mainUtilities);
+                console.log(extraUtilities);
               }}
               sx={[
                 {
@@ -146,6 +227,7 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
         <Divider />
         {drawListRender(extraUtilities)}
       </Drawer>
+      {/* {renderUtility(currentUtility)} */}
       {currentUtility.component}
     </Box>
   );

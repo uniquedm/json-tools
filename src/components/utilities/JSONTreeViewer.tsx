@@ -21,8 +21,13 @@ import {
 } from "@mui/material";
 import { JsonEditor } from "json-edit-react";
 import React from "react";
-import { defaultEditorJSON } from "../../data/Constants";
-import { jsonEditorCustomTheme } from "../../data/Themes";
+import { defaultEditorJSON } from "../../data/Defaults";
+import { UtilityProps } from "../../data/DrawerData";
+import {
+  darkTheme,
+  jsonEditCustomDarkTheme,
+  jsonEditCustomTheme,
+} from "../../data/Themes";
 import ExtraOptions from "../features/ExtraOptions";
 
 interface JSONEditAction {
@@ -30,7 +35,10 @@ interface JSONEditAction {
   actionIcon: JSX.Element;
 }
 
-export const JSONTreeViewer = () => {
+export const JSONTreeViewer: React.FC<UtilityProps> = ({
+  editorData = defaultEditorJSON,
+  theme = darkTheme,
+}) => {
   const [options, setOptions] = React.useState(() => ["Add", "Edit", "Delete"]);
 
   const actionList: JSONEditAction[] = [
@@ -49,8 +57,9 @@ export const JSONTreeViewer = () => {
   ];
 
   const toggleList = actionList.map((action) => (
-    <Tooltip title={`Toogle ${action["actionName"]}`}>
+    <Tooltip key={action.actionName} title={`Toogle ${action["actionName"]}`}>
       <ToggleButton
+        key={action.actionName}
         value={action["actionName"]}
         aria-label={action["actionName"]}
       >
@@ -141,8 +150,10 @@ export const JSONTreeViewer = () => {
           restrictEdit={!options.includes("Edit")}
           restrictAdd={!options.includes("Add")}
           restrictDelete={!options.includes("Delete")}
-          theme={jsonEditorCustomTheme}
-          data={defaultEditorJSON}
+          theme={
+            theme === darkTheme ? jsonEditCustomDarkTheme : jsonEditCustomTheme
+          }
+          data={editorData}
         />
       </Box>
     </Box>

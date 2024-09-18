@@ -1,10 +1,6 @@
 import { createTheme, Theme } from "@mui/material/styles";
 import { Dispatch, SetStateAction } from "react";
 
-export interface ThemeInput {
-  setTheme: Dispatch<SetStateAction<Theme>>;
-}
-
 export const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -17,7 +13,22 @@ export const lightTheme = createTheme({
   },
 });
 
-export const jsonEditorCustomTheme = {
+export interface ThemeInput {
+  setTheme: Dispatch<SetStateAction<Theme>>;
+  appTheme?: Theme;
+}
+
+export const jsonEditCustomTheme = {
+  displayName: "CustomDark",
+  styles: {
+    container: {
+      fontFamily: "monospace",
+      borderRadius: 0,
+    },
+  },
+};
+
+export const jsonEditCustomDarkTheme = {
   displayName: "CustomDark",
   fragments: { edit: "rgb(42, 161, 152)" },
   styles: {
@@ -58,4 +69,5 @@ export const jsonEditorCustomTheme = {
   },
 };
 
-export const githubDarkEdited = ["githubDark", jsonEditorCustomTheme];
+export const githubDarkEdited = ["githubDark", jsonEditCustomTheme];
+export const githubLightEdited = ["githubLight", jsonEditCustomTheme];

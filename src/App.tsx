@@ -11,7 +11,7 @@ function Home() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppDrawer setTheme={setTheme} />
+      <AppDrawer setTheme={setTheme} appTheme={theme} />
     </ThemeProvider>
   );
 }
