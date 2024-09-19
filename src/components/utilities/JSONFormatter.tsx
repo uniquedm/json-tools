@@ -37,7 +37,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   setEditorData,
   theme = darkTheme,
 }) => {
-  const editorTheme = theme === darkTheme ? "vs-dark" : "light";
+  const monacoTheme =
+    theme.appTheme.palette.mode === "dark" ? "vs-dark" : "light";
   // Snackbar Configuration
   const [snackbarConfig, setSnackbarConfig] = useState<SnackbarConfig>({
     open: false,
@@ -534,17 +535,17 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   // Define the actionList with correct typing
   const actionList: Action[] = [
     {
-      actionName: "Compact",
-      actionDesc: "Compact JSON",
-      actionIcon: <Compress />,
-      actionHandler: handleCompactJSON,
-      actionColor: "primary",
-    },
-    {
       actionName: "Format",
       actionDesc: "Format JSON",
       actionIcon: <DataObject />,
       actionHandler: handleFormatJSON,
+      actionColor: "primary",
+    },
+    {
+      actionName: "Compact",
+      actionDesc: "Compact JSON",
+      actionIcon: <Compress />,
+      actionHandler: handleCompactJSON,
       actionColor: "primary",
     },
     {
@@ -560,13 +561,6 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       actionIcon: <SwapVert />,
       actionHandler: handleReverseJSON,
       actionColor: "secondary",
-    },
-    {
-      actionName: "Remove Null",
-      actionDesc: "Remove Null Values",
-      actionIcon: <PlaylistRemove />,
-      actionHandler: handleRemoveNullValues,
-      actionColor: "error",
     },
     {
       actionName: "Repair",
@@ -588,6 +582,13 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       actionIcon: <FormatPaint />,
       actionHandler: handleEscapeJSON,
       actionColor: "success",
+    },
+    {
+      actionName: "Remove Null",
+      actionDesc: "Remove Null Values",
+      actionIcon: <PlaylistRemove />,
+      actionHandler: handleRemoveNullValues,
+      actionColor: "error",
     },
   ];
 
@@ -664,7 +665,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
             <Stack direction="row">
               <Box sx={{ flexGrow: 1, height: "70vh" }}>
                 <Editor
-                  theme={editorTheme}
+                  theme={monacoTheme}
                   defaultLanguage="json"
                   loading={<Skeleton variant="rounded" animation="wave" />}
                   defaultValue={JSON.stringify(editorData, null, 2)}

@@ -2,8 +2,10 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   FormControlLabel,
   Grid2,
+  Stack,
   TextField,
 } from "@mui/material";
 import { jwtDecode, JwtPayload } from "jwt-decode";
@@ -38,63 +40,60 @@ export const JWTUtility: React.FC<UtilityProps> = () => {
   };
 
   return (
-    <Box
-      margin={10}
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      gap={2}
-    >
-      <Grid2 container spacing={4}>
-        <Grid2 size={6}>
-          <TextField
-            label="JWT Token"
-            variant="outlined"
-            fullWidth
-            value={token}
-            multiline
-            onChange={(e) => setToken(e.target.value)}
-          />
-
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={decodeHeader}
-                onChange={(e) => setDecodeHeader(e.target.checked)}
-              />
-            }
-            label="Decode JWT Header"
-          />
-
-          <Button variant="contained" onClick={handleDecode}>
-            Decode Token
-          </Button>
-        </Grid2>
-        <Grid2 size={6}>
-          {decodedHeader && (
-            <Box width="100%" mb={2}>
+    <Box margin={10} display="flex" flexDirection="column" alignItems="center">
+      <Grid2 container spacing={12}>
+        <Stack width={"100vh"} spacing={2} direction={"row"}>
+          <Grid2 size={6}>
+            <Stack spacing={2}>
               <TextField
-                id="outlined-textarea"
-                label="Decoded Header"
+                label="JWT Token"
+                variant="outlined"
+                fullWidth
+                value={token}
                 multiline
-                disabled
-                value={JSON.stringify(decodedHeader, null, 2)}
+                onChange={(e) => setToken(e.target.value)}
               />
-            </Box>
-          )}
+              <Stack direction={"row"}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={decodeHeader}
+                      onChange={(e) => setDecodeHeader(e.target.checked)}
+                    />
+                  }
+                  label="Decode JWT Header"
+                />
+                <Button variant="contained" onClick={handleDecode}>
+                  Decode Token
+                </Button>
+              </Stack>
+            </Stack>
+          </Grid2>
+          <Divider sx={{ pl: 5 }} orientation="vertical" />
+          <Grid2 size={6}>
+            {decodedHeader && (
+              <Box width="100%" mb={2}>
+                <TextField
+                  id="outlined-textarea"
+                  label="Decoded Header"
+                  multiline
+                  value={JSON.stringify(decodedHeader, null, 2)}
+                />
+              </Box>
+            )}
 
-          {decodedPayload && (
-            <Box width="100%">
-              <TextField
-                id="outlined-textarea"
-                label="Decoded Payload"
-                multiline
-                disabled
-                value={JSON.stringify(decodedPayload, null, 2)}
-              />
-            </Box>
-          )}
-        </Grid2>
+            {decodedPayload && (
+              <Box width="100%">
+                <TextField
+                  id="outlined-textarea"
+                  label="Decoded Payload"
+                  multiline
+                  value={JSON.stringify(decodedPayload, null, 2)}
+                />
+              </Box>
+            )}
+          </Grid2>
+        </Stack>
       </Grid2>
     </Box>
   );

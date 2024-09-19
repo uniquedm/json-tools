@@ -39,6 +39,12 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
   theme = darkTheme,
 }) => {
+  const monacoTheme =
+    theme.appTheme.palette.mode === "dark" ? "vs-dark" : "light";
+  const jsonEditorTheme =
+    theme.appTheme.palette.mode === "dark"
+      ? jsonEditCustomDarkTheme
+      : jsonEditCustomTheme;
   // Initialize state for the input value
   const [pathValue, setPathValue] = useState("$.objectField.nestedObject");
 
@@ -172,7 +178,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
               <Grid2 size={6}>
                 <Editor
                   height={"70vh"}
-                  theme={theme === darkTheme ? "vs-dark" : "light"}
+                  theme={monacoTheme}
                   defaultLanguage="json"
                   loading={<Skeleton variant="rounded" animation="wave" />}
                   defaultValue={JSON.stringify(editorData, null, 2)}
@@ -190,11 +196,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
                     ok: <Done />,
                     cancel: <Close />,
                   }}
-                  theme={
-                    theme === darkTheme
-                      ? jsonEditCustomDarkTheme
-                      : jsonEditCustomTheme
-                  }
+                  theme={jsonEditorTheme}
                   data={outputJSON}
                 />
               </Grid2>

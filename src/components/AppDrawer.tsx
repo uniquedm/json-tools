@@ -24,8 +24,10 @@ import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { defaultEditorJSON } from "../data/Defaults";
 import { Utility } from "../data/DrawerData";
 import { ThemeInput } from "../data/Themes";
+import renderUtility from "./commons/CommonUtilities";
 import DarkModeSwitch from "./features/DarkModeSwitch";
 import GithubStarCount from "./features/GithubStarCount";
 import { DifferenceUtility } from "./utilities/DifferenceUtility";
@@ -41,20 +43,11 @@ const mainUtilities: { [key: string]: Utility } = {
     isOpen: true,
     tooltip: "Formatting Utilities",
     toolName: "JSON Formatter",
-    // props: {
-    //   editorData: editorData,
-    //   setEditorData: setEditorData,
-    //   theme: appTheme,
-    // },
   },
   TREEVIEW: {
     component: <JSONTreeViewer />,
     navIcon: <AccountTree />,
     isOpen: false,
-    // props: {
-    //   editorData: editorData,
-    //   theme: appTheme,
-    // },
     tooltip: "JSON Tree",
     toolName: "JSON Tree",
   },
@@ -62,10 +55,6 @@ const mainUtilities: { [key: string]: Utility } = {
     component: <JSONPathUtility />,
     navIcon: <ManageSearch />,
     isOpen: false,
-    // props: {
-    //   editorData: editorData,
-    //   theme: appTheme,
-    // },
     tooltip: "JSON Path Evaluation",
     toolName: "JSON Path Evaluator",
   },
@@ -76,9 +65,6 @@ const extraUtilities: { [key: string]: Utility } = {
     component: <DifferenceUtility />,
     navIcon: <Difference />,
     isOpen: false,
-    // props: {
-    //   theme: appTheme,
-    // },
     tooltip: "Data Difference Utility",
     toolName: "Difference Checker",
   },
@@ -86,18 +72,15 @@ const extraUtilities: { [key: string]: Utility } = {
     component: <JWTUtility />,
     navIcon: <Security />,
     isOpen: false,
-    // props: {
-    //   theme: appTheme,
-    // },
     tooltip: "JWT Decoder",
     toolName: "JWT Decoder",
   },
 };
 
-export default function AppDrawer({ setTheme }: ThemeInput) {
+export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  // const [editorData, setEditorData] = React.useState(defaultEditorJSON);
+  const [editorData, setEditorData] = React.useState(defaultEditorJSON);
 
   const [currentUtility, setCurrentUtility] = React.useState(
     mainUtilities.FORMAT
@@ -115,23 +98,16 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
     return (
       <List>
         {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
-          <ListItem
-            key={utilityDetails.toolName}
-            disablePadding
-            sx={{ display: "block" }}
-          >
+          <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
             <ListItemButton
               onClick={() => {
-                currentUtility["isOpen"] = false;
-                utilityDetails["isOpen"] = true;
+                currentUtility.isOpen = false;
+                utilityDetails.isOpen = true;
                 setCurrentUtility(utilityDetails);
-                console.log(utilityDetails);
-                console.log(mainUtilities);
-                console.log(extraUtilities);
               }}
               sx={[
                 {
-                  color: utilityDetails["isOpen"] ? "#90caf9" : "gray",
+                  color: utilityDetails.isOpen ? "#90caf9" : "gray",
                   minHeight: 48,
                   px: 2.5,
                 },
@@ -144,11 +120,11 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
                     },
               ]}
             >
-              <Tooltip title={utilityDetails["tooltip"]}>
+              <Tooltip title={utilityDetails.tooltip}>
                 <ListItemIcon
                   sx={[
                     {
-                      color: utilityDetails["isOpen"] ? "#90caf9" : "gray",
+                      color: utilityDetails.isOpen ? "#90caf9" : "gray",
                       minWidth: 0,
                       justifyContent: "center",
                     },
@@ -161,11 +137,11 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
                         },
                   ]}
                 >
-                  {utilityDetails["navIcon"]}
+                  {utilityDetails.navIcon}
                 </ListItemIcon>
               </Tooltip>
               <ListItemText
-                primary={utilityName}
+                primary={utilityDetails.toolName}
                 sx={[
                   open
                     ? {
@@ -203,7 +179,7 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
             <MenuIcon />
           </IconButton>
           {currentUtility["navIcon"]}
-          <Typography sx={{ ml: "1rem" }} variant="h6" noWrap component="div">
+          <Typography sx={{ ml: "1rem" }} variant="h6" noWrap component="h6">
             {currentUtility["toolName"]}
           </Typography>
           <Stack sx={{ ml: "auto" }} direction="row">
@@ -227,13 +203,17 @@ export default function AppDrawer({ setTheme }: ThemeInput) {
         <Divider />
         {drawListRender(extraUtilities)}
       </Drawer>
-      {/* {renderUtility(currentUtility)} */}
-      {currentUtility.component}
+      {renderUtility(currentUtility, {
+        editorData: editorData,
+        setEditorData: setEditorData,
+        theme: { appTheme },
+      })}
+      {/* {currentUtility.component} */}
     </Box>
   );
 }
 
-const drawerWidth = 180;
+const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,

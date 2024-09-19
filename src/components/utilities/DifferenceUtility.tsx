@@ -21,6 +21,8 @@ import ExtraOptions from "../features/ExtraOptions";
 export const DifferenceUtility: React.FC<UtilityProps> = ({
   theme = darkTheme,
 }) => {
+  const monacoTheme =
+    theme.appTheme.palette.mode === "dark" ? "vs-dark" : "light";
   const [editorLanguage, setEditorLanguage] = React.useState("json");
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -61,7 +63,7 @@ export const DifferenceUtility: React.FC<UtilityProps> = ({
       <Box sx={{ mt: 2 }}>
         <DiffEditor
           language={editorLanguage}
-          theme={theme === darkTheme ? "vs-dark" : "light"}
+          theme={monacoTheme}
           original={defaultEditorValue}
           modified={defaultModifiedValue}
           options={{
