@@ -21,8 +21,7 @@ import ExtraOptions from "../features/ExtraOptions";
 export const DifferenceUtility: React.FC<UtilityProps> = ({
   theme = darkTheme,
 }) => {
-  const monacoTheme =
-    theme.appTheme.palette.mode === "dark" ? "vs-dark" : "light";
+  const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
   const [editorLanguage, setEditorLanguage] = React.useState("json");
 
   const handleChange = (event: SelectChangeEvent) => {

@@ -1,13 +1,15 @@
 import {
+  AccountTree,
   DataObject,
   Difference,
-  Edit,
   ManageSearch,
+  Security,
 } from "@mui/icons-material";
 import { DifferenceUtility } from "../components/utilities/DifferenceUtility";
 import { JSONFormatter } from "../components/utilities/JSONFormatter";
 import { JSONPathUtility } from "../components/utilities/JSONPathUtility";
 import { JSONTreeViewer } from "../components/utilities/JSONTreeViewer";
+import { JWTUtility } from "../components/utilities/JWTUtility";
 
 export interface Utility {
   component: JSX.Element;
@@ -25,14 +27,14 @@ export const mainUtilities: { [key: string]: Utility } = {
     tooltip: "Formatting Utilities",
     toolName: "JSON Formatter",
   },
-  EDITOR: {
+  TREEVIEW: {
     component: <JSONTreeViewer />,
-    navIcon: <Edit />,
+    navIcon: <AccountTree />,
     isOpen: false,
-    tooltip: "JSON Editor",
-    toolName: "JSON Editor",
+    tooltip: "JSON Tree",
+    toolName: "JSON Tree",
   },
-  "JSON PATH": {
+  JPATH: {
     component: <JSONPathUtility />,
     navIcon: <ManageSearch />,
     isOpen: false,
@@ -48,5 +50,12 @@ export const extraUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "Data Difference Utility",
     toolName: "Difference Checker",
+  },
+  JWTDECODE: {
+    component: <JWTUtility />,
+    navIcon: <Security />,
+    isOpen: false,
+    tooltip: "JWT Decoder",
+    toolName: "JWT Decoder",
   },
 };

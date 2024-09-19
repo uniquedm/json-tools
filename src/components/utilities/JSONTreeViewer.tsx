@@ -40,9 +40,7 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
   theme = darkTheme,
 }) => {
   const jsonEditorTheme =
-    theme.appTheme.palette.mode === "dark"
-      ? jsonEditCustomDarkTheme
-      : jsonEditCustomTheme;
+    theme === darkTheme ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
   const [options, setOptions] = React.useState(() => ["Add", "Edit", "Delete"]);
   const actionList: JSONEditAction[] = [
     {

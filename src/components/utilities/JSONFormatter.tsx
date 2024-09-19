@@ -25,25 +25,20 @@ import {
 } from "@mui/material";
 import { jsonrepair } from "jsonrepair";
 import * as monacoEditor from "monaco-editor";
-import React, { useState } from "react";
+import React from "react";
 import { defaultEditorJSON } from "../../data/Defaults";
 import { UtilityProps } from "../../data/DrawerData";
 import { darkTheme } from "../../data/Themes";
+import { removeNullValues } from "../commons/JSONUtilities";
 import ExtraOptions from "../features/ExtraOptions";
-import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
 
 export const JSONFormatter: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
   setEditorData,
   theme = darkTheme,
+  setSnackbarConfig,
 }) => {
-  const monacoTheme =
-    theme.appTheme.palette.mode === "dark" ? "vs-dark" : "light";
-  // Snackbar Configuration
-  const [snackbarConfig, setSnackbarConfig] = useState<SnackbarConfig>({
-    open: false,
-  });
-
+  const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
   // Correctly type the editorRef to be a monaco editor instance or null
   const editorRef =
     React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
@@ -52,34 +47,19 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     editorRef.current = editor;
   };
 
-  const removeNullValues = (json: any): any => {
-    if (Array.isArray(json)) {
-      return json
-        .map((item) => removeNullValues(item))
-        .filter((item) => item !== null);
-    } else if (json !== null && typeof json === "object") {
-      return Object.entries(json).reduce((acc, [key, value]) => {
-        const cleanedValue = removeNullValues(value);
-        if (cleanedValue !== null) {
-          acc[key] = cleanedValue;
-        }
-        return acc;
-      }, {} as Record<string, any>);
-    }
-    return json;
-  };
-
   const unescapeJSON = (escapedJsonString: string): any => {
     try {
       const unescapedString = JSON.parse(escapedJsonString);
       return JSON.parse(unescapedString);
     } catch (error) {
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Invalid escaped JSON string: ${error}`,
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "error",
+            message: `Invalid escaped JSON string: ${error}`,
+            duration: 4000,
+          });
       return null;
     }
   };
@@ -97,19 +77,21 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       const parsedJson = JSON.parse(rawJson);
       const cleanedJson = removeNullValues(parsedJson);
       editorRef.current.setValue(JSON.stringify(cleanedJson, null, 2)); // Set cleaned JSON without formatting
-      setSnackbarConfig({
-        open: true,
-        severity: "success",
-        message: "Removed null values!",
-        duration: 2000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "Removed null values!",
+          duration: 2000,
+        });
     } catch (error) {
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Invalid JSON: ${error}`,
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
     }
   };
 
@@ -126,19 +108,21 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       const repairedJson = jsonrepair(rawJson);
       const parsedJson = JSON.parse(repairedJson);
       editorRef.current.setValue(JSON.stringify(parsedJson, null, 2)); // Set cleaned JSON without formatting
-      setSnackbarConfig({
-        open: true,
-        severity: "success",
-        message: "Repaired JSON!",
-        duration: 2000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "Repaired JSON!",
+          duration: 2000,
+        });
     } catch (error) {
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Invalid JSON: ${error}`,
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
     }
   };
 
@@ -154,12 +138,13 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
     if (normalJson !== null) {
       editorRef.current.setValue(JSON.stringify(normalJson, null, 2)); // Optionally format the JSON
-      setSnackbarConfig({
-        open: true,
-        severity: "success",
-        message: "Unescaped JSON!",
-        duration: 2000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "Unescaped JSON!",
+          duration: 2000,
+        });
     }
   };
 
@@ -172,12 +157,13 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
     const jsonString = editorRef.current.getValue();
     editorRef.current.setValue(JSON.stringify(jsonString));
-    setSnackbarConfig({
-      open: true,
-      severity: "success",
-      message: "Escape JSON!",
-      duration: 2000,
-    });
+    if (setSnackbarConfig)
+      setSnackbarConfig({
+        open: true,
+        severity: "success",
+        message: "Escape JSON!",
+        duration: 2000,
+      });
   };
 
   const handleCompactJSON = () => {
@@ -197,19 +183,21 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       const parsedJson = JSON.parse(rawJson); // Parse the JSON string to an object
       const prettyJson = JSON.stringify(parsedJson, null, 0); // Convert the object back to a compacted JSON string
       editorRef.current.setValue(prettyJson); // Set the pretty-printed JSON in the editor
-      setSnackbarConfig({
-        open: true,
-        severity: "success",
-        message: "Compacted!",
-        duration: 2000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "Compacted!",
+          duration: 2000,
+        });
     } catch (error) {
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Invalid JSON: ${error}`,
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
       editorRef.current.setValue(rawJson);
     }
   };
@@ -231,19 +219,21 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       const parsedJson = JSON.parse(rawJson); // Parse the JSON string to an object
       const prettyJson = JSON.stringify(parsedJson, null, 2); // Convert the object back to a pretty-printed JSON string
       editorRef.current.setValue(prettyJson); // Set the pretty-printed JSON in the editor
-      setSnackbarConfig({
-        open: true,
-        severity: "success",
-        message: "Formatted!",
-        duration: 2000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "Formatted!",
+          duration: 2000,
+        });
     } catch (error) {
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Invalid JSON: ${error}`,
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
       editorRef.current.setValue(rawJson);
     }
   };
@@ -286,32 +276,35 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         editorRef.current.setValue(prettyJson);
 
         // Show success message
-        setSnackbarConfig({
-          open: true,
-          severity: "success",
-          message: "JSON sorted alphabetically!",
-          duration: 2000,
-        });
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "success",
+            message: "JSON sorted alphabetically!",
+            duration: 2000,
+          });
       } else {
         // If it's not an object, show a warning
         console.warn(
           "JSON is not an object. Sorting is only applicable to objects."
         );
-        setSnackbarConfig({
-          open: true,
-          severity: "warning",
-          message: "Sorting only applies to JSON objects.",
-          duration: 2000,
-        });
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "warning",
+            message: "Sorting only applies to JSON objects.",
+            duration: 2000,
+          });
       }
     } catch (error) {
       // Handle errors (e.g., invalid JSON)
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Invalid JSON: ${error}`,
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
 
       // Optionally, set the original raw JSON back in the editor in case of error
       editorRef.current.setValue(rawJson);
@@ -356,32 +349,35 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         editorRef.current.setValue(prettyJson);
 
         // Show success message
-        setSnackbarConfig({
-          open: true,
-          severity: "success",
-          message: "JSON keys reversed!",
-          duration: 2000,
-        });
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "success",
+            message: "JSON keys reversed!",
+            duration: 2000,
+          });
       } else {
         // If it's not an object, show a warning
         console.warn(
           "JSON is not an object. Reversing is only applicable to objects."
         );
-        setSnackbarConfig({
-          open: true,
-          severity: "warning",
-          message: "Reversing only applies to JSON objects.",
-          duration: 2000,
-        });
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "warning",
+            message: "Reversing only applies to JSON objects.",
+            duration: 2000,
+          });
       }
     } catch (error) {
       // Handle errors (e.g., invalid JSON)
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Invalid JSON: ${error}`, // Use error.message for a cleaner message
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`, // Use error.message for a cleaner message
+          duration: 4000,
+        });
 
       // Optionally, set the original raw JSON back in the editor in case of error
       editorRef.current.setValue(rawJson);
@@ -397,20 +393,22 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     navigator.clipboard
       .writeText(rawJson)
       .then(() => {
-        setSnackbarConfig({
-          open: true,
-          severity: "info",
-          message: "Text copied to clipboard",
-          duration: 2000,
-        });
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "info",
+            message: "Text copied to clipboard",
+            duration: 2000,
+          });
       })
       .catch((err) => {
-        setSnackbarConfig({
-          open: true,
-          severity: "error",
-          message: `Failed to copy text: ${err}`,
-          duration: 4000,
-        });
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "error",
+            message: `Failed to copy text: ${err}`,
+            duration: 4000,
+          });
       });
   };
 
@@ -444,12 +442,13 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       // Close the stream
       await writable.close();
     } catch (err) {
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Error saving file: ${err}`,
-        duration: 4000,
-      });
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Error saving file: ${err}`,
+          duration: 4000,
+        });
     }
   };
 
@@ -488,27 +487,30 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         if (setEditorData) setEditorData(parsedJson);
 
         // Show success message
-        setSnackbarConfig({
-          open: true,
-          severity: "success",
-          message: "JSON file loaded successfully!",
-          duration: 2000,
-        });
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "success",
+            message: "JSON file loaded successfully!",
+            duration: 2000,
+          });
       } catch (parseError) {
+        if (setSnackbarConfig)
+          setSnackbarConfig({
+            open: true,
+            severity: "error",
+            message: "Invalid JSON file. Please check the file content.",
+            duration: 4000,
+          });
+      }
+    } catch (error) {
+      if (setSnackbarConfig)
         setSnackbarConfig({
           open: true,
           severity: "error",
-          message: "Invalid JSON file. Please check the file content.",
+          message: `Error loading file: ${error}`,
           duration: 4000,
         });
-      }
-    } catch (error) {
-      setSnackbarConfig({
-        open: true,
-        severity: "error",
-        message: `Error loading file: ${error}`,
-        duration: 4000,
-      });
     }
   };
 
@@ -676,10 +678,6 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
           </Stack>
         </Grid2>
       </Grid2>
-      <SnackbarAlert
-        snackbarConfig={snackbarConfig}
-        setSnackbarConfig={setSnackbarConfig}
-      />
     </Box>
   );
 };

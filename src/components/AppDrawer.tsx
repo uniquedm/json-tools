@@ -1,10 +1,3 @@
-import {
-  AccountTree,
-  DataObject,
-  Difference,
-  ManageSearch,
-  Security,
-} from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -27,142 +20,36 @@ import * as React from "react";
 import { defaultEditorJSON } from "../data/Defaults";
 import { Utility } from "../data/DrawerData";
 import { ThemeInput } from "../data/Themes";
+import { extraUtilities, mainUtilities } from "../data/Utilities";
 import renderUtility from "./commons/CommonUtilities";
 import DarkModeSwitch from "./features/DarkModeSwitch";
 import GithubStarCount from "./features/GithubStarCount";
-import { DifferenceUtility } from "./utilities/DifferenceUtility";
-import { JSONFormatter } from "./utilities/JSONFormatter";
-import { JSONPathUtility } from "./utilities/JSONPathUtility";
-import { JSONTreeViewer } from "./utilities/JSONTreeViewer";
-import { JWTUtility } from "./utilities/JWTUtility";
-
-const mainUtilities: { [key: string]: Utility } = {
-  FORMAT: {
-    component: <JSONFormatter />,
-    navIcon: <DataObject />,
-    isOpen: true,
-    tooltip: "Formatting Utilities",
-    toolName: "JSON Formatter",
-  },
-  TREEVIEW: {
-    component: <JSONTreeViewer />,
-    navIcon: <AccountTree />,
-    isOpen: false,
-    tooltip: "JSON Tree",
-    toolName: "JSON Tree",
-  },
-  JPATH: {
-    component: <JSONPathUtility />,
-    navIcon: <ManageSearch />,
-    isOpen: false,
-    tooltip: "JSON Path Evaluation",
-    toolName: "JSON Path Evaluator",
-  },
-};
-
-const extraUtilities: { [key: string]: Utility } = {
-  DIFFERENCE: {
-    component: <DifferenceUtility />,
-    navIcon: <Difference />,
-    isOpen: false,
-    tooltip: "Data Difference Utility",
-    toolName: "Difference Checker",
-  },
-  JWTDECODE: {
-    component: <JWTUtility />,
-    navIcon: <Security />,
-    isOpen: false,
-    tooltip: "JWT Decoder",
-    toolName: "JWT Decoder",
-  },
-};
+import SnackbarAlert, { SnackbarConfig } from "./features/SnackbarAlert";
 
 export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [isDrawerOpen, toggleDrawer] = React.useState(false);
   const [editorData, setEditorData] = React.useState(defaultEditorJSON);
-
   const [currentUtility, setCurrentUtility] = React.useState(
     mainUtilities.FORMAT
   );
+  // Snackbar Configuration
+  const [snackbarConfig, setSnackbarConfig] = React.useState<SnackbarConfig>({
+    open: false,
+  });
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    toggleDrawer(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const drawListRender = (utilityMap: { [key: string]: Utility }) => {
-    return (
-      <List>
-        {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
-          <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              onClick={() => {
-                currentUtility.isOpen = false;
-                utilityDetails.isOpen = true;
-                setCurrentUtility(utilityDetails);
-              }}
-              sx={[
-                {
-                  color: utilityDetails.isOpen ? "#90caf9" : "gray",
-                  minHeight: 48,
-                  px: 2.5,
-                },
-                open
-                  ? {
-                      justifyContent: "initial",
-                    }
-                  : {
-                      justifyContent: "center",
-                    },
-              ]}
-            >
-              <Tooltip title={utilityDetails.tooltip}>
-                <ListItemIcon
-                  sx={[
-                    {
-                      color: utilityDetails.isOpen ? "#90caf9" : "gray",
-                      minWidth: 0,
-                      justifyContent: "center",
-                    },
-                    open
-                      ? {
-                          mr: 3,
-                        }
-                      : {
-                          mr: "auto",
-                        },
-                  ]}
-                >
-                  {utilityDetails.navIcon}
-                </ListItemIcon>
-              </Tooltip>
-              <ListItemText
-                primary={utilityDetails.toolName}
-                sx={[
-                  open
-                    ? {
-                        opacity: 1,
-                      }
-                    : {
-                        opacity: 0,
-                      },
-                ]}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    );
+    toggleDrawer(false);
   };
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={isDrawerOpen}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -173,7 +60,7 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
               {
                 marginRight: 5,
               },
-              open && { display: "none" },
+              isDrawerOpen && { display: "none" },
             ]}
           >
             <MenuIcon />
@@ -188,7 +75,7 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
           </Stack>
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={open}>
+      <Drawer variant="permanent" open={isDrawerOpen}>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (
@@ -199,21 +86,106 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        {drawListRender(mainUtilities)}
+        {drawerListItems(
+          mainUtilities,
+          isDrawerOpen,
+          currentUtility,
+          setCurrentUtility
+        )}
         <Divider />
-        {drawListRender(extraUtilities)}
+        {drawerListItems(
+          extraUtilities,
+          isDrawerOpen,
+          currentUtility,
+          setCurrentUtility
+        )}
       </Drawer>
       {renderUtility(currentUtility, {
         editorData: editorData,
         setEditorData: setEditorData,
-        theme: { appTheme },
+        theme: appTheme,
+        snackbarConfig: snackbarConfig,
+        setSnackbarConfig: setSnackbarConfig,
       })}
-      {/* {currentUtility.component} */}
+      <SnackbarAlert
+        snackbarConfig={snackbarConfig}
+        setSnackbarConfig={setSnackbarConfig}
+      />
     </Box>
   );
 }
 
 const drawerWidth = 240;
+
+const drawerListItems = (
+  utilityMap: { [key: string]: Utility },
+  open: any,
+  currentUtility: any,
+  setCurrentUtility: any
+) => {
+  return (
+    <List>
+      {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
+        <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
+          <ListItemButton
+            onClick={() => {
+              currentUtility.isOpen = false;
+              utilityDetails.isOpen = true;
+              setCurrentUtility(utilityDetails);
+            }}
+            sx={[
+              {
+                color: utilityDetails.isOpen ? "#90caf9" : "gray",
+                minHeight: 48,
+                px: 2.5,
+              },
+              open
+                ? {
+                    justifyContent: "initial",
+                  }
+                : {
+                    justifyContent: "center",
+                  },
+            ]}
+          >
+            <Tooltip title={utilityDetails.tooltip}>
+              <ListItemIcon
+                sx={[
+                  {
+                    color: utilityDetails.isOpen ? "#90caf9" : "gray",
+                    minWidth: 0,
+                    justifyContent: "center",
+                  },
+                  open
+                    ? {
+                        mr: 3,
+                      }
+                    : {
+                        mr: "auto",
+                      },
+                ]}
+              >
+                {utilityDetails.navIcon}
+              </ListItemIcon>
+            </Tooltip>
+            <ListItemText
+              primary={utilityDetails.toolName}
+              sx={[
+                open
+                  ? {
+                      opacity: 1,
+                    }
+                  : {
+                      opacity: 0,
+                    },
+              ]}
+            />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </List>
+  );
+};
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,

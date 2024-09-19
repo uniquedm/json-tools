@@ -39,12 +39,9 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
   theme = darkTheme,
 }) => {
-  const monacoTheme =
-    theme.appTheme.palette.mode === "dark" ? "vs-dark" : "light";
+  const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
   const jsonEditorTheme =
-    theme.appTheme.palette.mode === "dark"
-      ? jsonEditCustomDarkTheme
-      : jsonEditCustomTheme;
+    theme === darkTheme ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
   // Initialize state for the input value
   const [pathValue, setPathValue] = useState("$.objectField.nestedObject");
 

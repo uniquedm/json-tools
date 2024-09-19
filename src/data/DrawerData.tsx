@@ -1,4 +1,6 @@
+import { Theme } from "@mui/material";
 import { Dispatch, SetStateAction } from "react";
+import { SnackbarConfig } from "../components/features/SnackbarAlert";
 
 export interface Utility<Props = any> {
   component: React.ReactElement<Props>; // Component that can accept props dynamically
@@ -12,5 +14,6 @@ export interface Utility<Props = any> {
 export interface UtilityProps {
   editorData?: Record<string, any>; // JSON object to be passed into the editor
   setEditorData?: Dispatch<SetStateAction<Record<string, any>>>;
-  theme?: any; // Optional theme with default of "vs-dark"
+  theme?: Theme; // Optional theme with default of "vs-dark"
+  setSnackbarConfig?: Dispatch<SetStateAction<SnackbarConfig>>;
 }
