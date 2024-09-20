@@ -23,6 +23,7 @@ A simple web application that provides various JSON tools to help you work with 
 - **JSON Path**: [jsonpath-plus](https://www.npmjs.com/package/jsonpath-plus)
 - **JSON Repair**: [jsonrepair](https://www.npmjs.com/package/jsonrepair)
 - **JWT Decode**: [jwt-decode](https://www.npmjs.com/package/jwt-decode)
+- **JSON Schema Validator**: [ajv](https://www.npmjs.com/package/ajv)
 - **Routing**: [react-router-dom](https://reactrouter.com/)
 
 ## Getting Started

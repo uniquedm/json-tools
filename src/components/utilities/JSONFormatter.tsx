@@ -598,13 +598,10 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   const actionButtons = actionList.map((action, index) => (
     <Tooltip key={index} title={action.actionDesc}>
       <Button
-        size="small"
-        variant="contained"
         startIcon={action.actionIcon}
         aria-label={action.actionDesc}
         color={action.actionColor || "inherit"} // Use a valid color
         onClick={action.actionHandler}
-        sx={{}}
       >
         {action.actionName}
       </Button>
@@ -659,21 +656,20 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                   </Tooltip>
                 </Stack>
                 <Divider orientation="vertical" flexItem />
-                <ButtonGroup variant="text" size="small">
+                <ButtonGroup disableElevation variant="text" size="small">
                   {isLabeled ? actionButtons : actionIconButtons}
                 </ButtonGroup>
               </Stack>
             </Paper>
             <Stack direction="row">
-              <Box sx={{ flexGrow: 1, height: "70vh" }}>
-                <Editor
-                  theme={monacoTheme}
-                  defaultLanguage="json"
-                  loading={<Skeleton variant="rounded" animation="wave" />}
-                  defaultValue={JSON.stringify(editorData, null, 2)}
-                  onMount={handleEditorDidMount}
-                />
-              </Box>
+              <Editor
+                theme={monacoTheme}
+                height={"70vh"}
+                defaultLanguage="json"
+                loading={<Skeleton variant="rounded" animation="wave" />}
+                defaultValue={JSON.stringify(editorData, null, 2)}
+                onMount={handleEditorDidMount}
+              />
             </Stack>
           </Stack>
         </Grid2>

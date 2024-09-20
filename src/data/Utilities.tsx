@@ -2,12 +2,14 @@ import {
   AccountTree,
   DataObject,
   Difference,
+  FactCheck,
   ManageSearch,
   Security,
 } from "@mui/icons-material";
 import { DifferenceUtility } from "../components/utilities/DifferenceUtility";
 import { JSONFormatter } from "../components/utilities/JSONFormatter";
 import { JSONPathUtility } from "../components/utilities/JSONPathUtility";
+import { JSONSchemaValidator } from "../components/utilities/JSONSchemaValidator";
 import { JSONTreeViewer } from "../components/utilities/JSONTreeViewer";
 import { JWTUtility } from "../components/utilities/JWTUtility";
 
@@ -40,6 +42,13 @@ export const mainUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "JSON Path Evaluation",
     toolName: "JSON Path Evaluator",
+  },
+  AJV: {
+    component: <JSONSchemaValidator />,
+    navIcon: <FactCheck />,
+    isOpen: false,
+    tooltip: "JSON Schema Validator",
+    toolName: "JSON Schema Validator",
   },
 };
 

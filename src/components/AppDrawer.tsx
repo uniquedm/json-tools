@@ -1,3 +1,4 @@
+import { HomeRepairService } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -28,7 +29,7 @@ import SnackbarAlert, { SnackbarConfig } from "./features/SnackbarAlert";
 
 export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
   const theme = useTheme();
-  const [isDrawerOpen, toggleDrawer] = React.useState(false);
+  const [isDrawerOpen, toggleDrawer] = React.useState(true);
   const [editorData, setEditorData] = React.useState(defaultEditorJSON);
   const [currentUtility, setCurrentUtility] = React.useState(
     mainUtilities.FORMAT
@@ -44,6 +45,80 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
 
   const handleDrawerClose = () => {
     toggleDrawer(false);
+  };
+
+  const drawerListItems = (
+    utilityMap: { [key: string]: Utility },
+    open: any,
+    currentUtility: any,
+    setCurrentUtility: any
+  ) => {
+    return (
+      <List>
+        {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
+          <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              onClick={() => {
+                currentUtility.isOpen = false;
+                utilityDetails.isOpen = true;
+                setCurrentUtility(utilityDetails);
+              }}
+              sx={[
+                {
+                  color: utilityDetails.isOpen
+                    ? appTheme?.palette.primary.main
+                    : appTheme?.palette.text.disabled,
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: "initial",
+                    }
+                  : {
+                      justifyContent: "center",
+                    },
+              ]}
+            >
+              <Tooltip title={utilityDetails.tooltip}>
+                <ListItemIcon
+                  sx={[
+                    {
+                      color: utilityDetails.isOpen
+                        ? appTheme?.palette.primary.main
+                        : appTheme?.palette.text.disabled,
+                      minWidth: 0,
+                      justifyContent: "center",
+                    },
+                    open
+                      ? {
+                          mr: 3,
+                        }
+                      : {
+                          mr: "auto",
+                        },
+                  ]}
+                >
+                  {utilityDetails.navIcon}
+                </ListItemIcon>
+              </Tooltip>
+              <ListItemText
+                primary={utilityDetails.toolName}
+                sx={[
+                  open
+                    ? {
+                        opacity: 1,
+                      }
+                    : {
+                        opacity: 0,
+                      },
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    );
   };
 
   return (
@@ -77,6 +152,13 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
       </AppBar>
       <Drawer variant="permanent" open={isDrawerOpen}>
         <DrawerHeader>
+          <HomeRepairService fontSize="medium" color="primary" />
+          <Box sx={{ ml: 1 }}>
+            {" "}
+            <Typography variant="h5" color="primary">
+              JSON Tools
+            </Typography>
+          </Box>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (
               <ChevronRightIcon />
@@ -115,77 +197,7 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
   );
 }
 
-const drawerWidth = 240;
-
-const drawerListItems = (
-  utilityMap: { [key: string]: Utility },
-  open: any,
-  currentUtility: any,
-  setCurrentUtility: any
-) => {
-  return (
-    <List>
-      {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
-        <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
-          <ListItemButton
-            onClick={() => {
-              currentUtility.isOpen = false;
-              utilityDetails.isOpen = true;
-              setCurrentUtility(utilityDetails);
-            }}
-            sx={[
-              {
-                color: utilityDetails.isOpen ? "#90caf9" : "gray",
-                minHeight: 48,
-                px: 2.5,
-              },
-              open
-                ? {
-                    justifyContent: "initial",
-                  }
-                : {
-                    justifyContent: "center",
-                  },
-            ]}
-          >
-            <Tooltip title={utilityDetails.tooltip}>
-              <ListItemIcon
-                sx={[
-                  {
-                    color: utilityDetails.isOpen ? "#90caf9" : "gray",
-                    minWidth: 0,
-                    justifyContent: "center",
-                  },
-                  open
-                    ? {
-                        mr: 3,
-                      }
-                    : {
-                        mr: "auto",
-                      },
-                ]}
-              >
-                {utilityDetails.navIcon}
-              </ListItemIcon>
-            </Tooltip>
-            <ListItemText
-              primary={utilityDetails.toolName}
-              sx={[
-                open
-                  ? {
-                      opacity: 1,
-                    }
-                  : {
-                      opacity: 0,
-                    },
-              ]}
-            />
-          </ListItemButton>
-        </ListItem>
-      ))}
-    </List>
-  );
-};
+const drawerWidth = 260;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,

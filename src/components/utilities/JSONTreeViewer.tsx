@@ -81,7 +81,7 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Grid2 container sx={{ mt: 4 }} spacing={4}>
+      <Grid2 container sx={{ mt: 4 }} spacing={2}>
         <Grid2 size={12}>
           <Stack spacing={2} direction="column">
             <Paper>
@@ -134,27 +134,28 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
             </Paper>
           </Stack>
         </Grid2>
+        <Grid2 size={12}>
+          <JsonEditor
+            showCollectionCount={showCount}
+            collapse={collapseLevel}
+            enableClipboard
+            minWidth={"100%"}
+            icons={{
+              add: <Add />,
+              edit: <Edit />,
+              delete: <Delete />,
+              copy: <ContentCopy />,
+              ok: <Done />,
+              cancel: <Close />,
+            }}
+            restrictEdit={!options.includes("Edit")}
+            restrictAdd={!options.includes("Add")}
+            restrictDelete={!options.includes("Delete")}
+            theme={jsonEditorTheme}
+            data={editorData}
+          />
+        </Grid2>
       </Grid2>
-      <Box sx={{ mt: 2, flexGrow: 1 }}>
-        <JsonEditor
-          showCollectionCount={showCount}
-          collapse={collapseLevel}
-          enableClipboard
-          icons={{
-            add: <Add />,
-            edit: <Edit />,
-            delete: <Delete />,
-            copy: <ContentCopy />,
-            ok: <Done />,
-            cancel: <Close />,
-          }}
-          restrictEdit={!options.includes("Edit")}
-          restrictAdd={!options.includes("Add")}
-          restrictDelete={!options.includes("Delete")}
-          theme={jsonEditorTheme}
-          data={editorData}
-        />
-      </Box>
     </Box>
   );
 };
