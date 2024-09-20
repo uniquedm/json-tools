@@ -590,7 +590,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       actionDesc: "Remove Null Values",
       actionIcon: <PlaylistRemove />,
       actionHandler: handleRemoveNullValues,
-      actionColor: "error",
+      actionColor: "inherit",
     },
   ];
 

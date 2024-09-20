@@ -43,7 +43,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
         opacity: 1,
         backgroundColor: "#aab4be",
         ...theme.applyStyles("dark", {
-          backgroundColor: "#8796A5",
+          backgroundColor: darkTheme.palette.primary.main,
         }),
       },
     },

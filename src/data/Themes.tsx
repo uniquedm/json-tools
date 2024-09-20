@@ -4,6 +4,9 @@ import { Dispatch, SetStateAction } from "react";
 export const darkTheme = createTheme({
   palette: {
     mode: "dark",
+    primary: {
+      main: "#ff5252",
+    },
   },
 });
 
@@ -22,6 +25,7 @@ export const jsonEditCustomTheme = {
   displayName: "CustomDark",
   styles: {
     container: {
+      backgroundColor: "#ffffff",
       fontFamily: "monospace",
       borderRadius: 0,
     },

@@ -9,9 +9,9 @@ import { darkTheme } from "../../data/Themes";
 import ExtraOptions from "../features/ExtraOptions";
 
 // Constants for editor types
-const SCHEMA = "Schema";
-const DATA = "Data";
-const RESULT = "Result";
+const SCHEMA = "SCHEMA";
+const DATA = "DATA";
+const RESULT = "RESULT";
 
 // Initial JSON schema and data to be validated
 const initialSchema = {
@@ -215,7 +215,13 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
         <Grid2 size={4}>
           <Box sx={{ position: "relative" }}>
             {generateWaterMark(RESULT)}
-            <div style={{ border: `2px solid ${isValid ? "green" : "red"}` }}>
+            <div
+              style={{
+                border: `4px solid ${
+                  isValid ? "rgba(0, 255, 0, 0.2)" : "rgba(255, 0, 0, 0.2)"
+                }`,
+              }}
+            >
               <Editor
                 theme={monacoTheme}
                 defaultLanguage="json"
@@ -224,6 +230,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
                 value={result}
                 defaultValue={JSON.stringify(successMessage, null, 2)}
                 options={{
+                  readOnly: true,
                   minimap: { enabled: false },
                   lineNumbers: "off", // Disable line numbers for the result editor
                 }}

@@ -129,8 +129,8 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Grid2 container sx={{ mt: 4 }} spacing={4}>
-        <Grid2 size={12}>
+      <Grid2 container sx={{ mt: 4 }}>
+        <Box sx={{ flex: 1 }}>
           <Stack spacing={2} direction="column">
             <Stack spacing={2} direction="row">
               <Paper
@@ -185,6 +185,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
               <Grid2 size={6}>
                 <JsonEditor
                   rootName="result"
+                  minWidth={"100%"}
                   restrictAdd={true}
                   restrictDelete={true}
                   restrictEdit={true}
@@ -199,7 +200,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
               </Grid2>
             </Grid2>
           </Stack>
-        </Grid2>
+        </Box>
       </Grid2>
       <Modal
         open={help}

@@ -5,7 +5,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Stack, Tooltip } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import MuiDrawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
@@ -122,8 +121,7 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
+    <Box sx={{ display: "flex", flexGrow: 1, flexBasis: 0 }}>
       <AppBar position="fixed" open={isDrawerOpen}>
         <Toolbar>
           <IconButton
@@ -152,11 +150,11 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
       </AppBar>
       <Drawer variant="permanent" open={isDrawerOpen}>
         <DrawerHeader>
-          <HomeRepairService fontSize="medium" color="primary" />
+          <HomeRepairService fontSize="medium" color="inherit" />
           <Box sx={{ ml: 1 }}>
             {" "}
-            <Typography variant="h5" color="primary">
-              JSON Tools
+            <Typography variant="h6" color="primary">
+              <strong>JSON TOOLS</strong>
             </Typography>
           </Box>
           <IconButton onClick={handleDrawerClose}>
