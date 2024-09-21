@@ -3,7 +3,9 @@ import {
   AutoFixHigh,
   Compress,
   DataObject,
+  Dehaze,
   FormatPaint,
+  LinearScale,
   PlaylistRemove,
   ReadMore,
   SortByAlpha,
@@ -23,6 +25,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { flatten, unflatten } from "flat";
 import { jsonrepair } from "jsonrepair";
 import * as monacoEditor from "monaco-editor";
 import React from "react";
@@ -188,6 +191,79 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
           open: true,
           severity: "success",
           message: "Compacted!",
+          duration: 2000,
+        });
+    } catch (error) {
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
+      editorRef.current.setValue(rawJson);
+    }
+  };
+
+  const handleFlattenJSON = () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    const rawJson = editorRef.current.getValue(); // Get the raw JSON string
+
+    if (!rawJson.trim()) {
+      console.warn("Editor content is empty.");
+      return;
+    }
+
+    try {
+      const parsedJson = JSON.parse(rawJson);
+      const flattenJson = flatten(parsedJson);
+      const prettyJson = JSON.stringify(flattenJson, null, 2);
+      editorRef.current.setValue(prettyJson);
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "Flatten!",
+          duration: 2000,
+        });
+    } catch (error) {
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
+      editorRef.current.setValue(rawJson);
+    }
+  };
+
+  const handleUnflattenJSON = () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    const rawJson = editorRef.current.getValue(); // Get the raw JSON string
+
+    if (!rawJson.trim()) {
+      console.warn("Editor content is empty.");
+      return;
+    }
+
+    try {
+      const parsedJson = JSON.parse(rawJson);
+      const prettyJson = JSON.stringify(unflatten(parsedJson), null, 2);
+      editorRef.current.setValue(prettyJson);
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "success",
+          message: "Unflatten!",
           duration: 2000,
         });
     } catch (error) {
@@ -551,6 +627,20 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       actionColor: "primary",
     },
     {
+      actionName: "Flatten",
+      actionDesc: "Flatten JSON",
+      actionIcon: <LinearScale />,
+      actionHandler: handleFlattenJSON,
+      actionColor: "primary",
+    },
+    {
+      actionName: "Unflatten",
+      actionDesc: "Unflatten JSON",
+      actionIcon: <Dehaze />,
+      actionHandler: handleUnflattenJSON,
+      actionColor: "primary",
+    },
+    {
       actionName: "Sort",
       actionDesc: "Sort JSON",
       actionIcon: <SortByAlpha />,
@@ -602,6 +692,12 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         aria-label={action.actionDesc}
         color={action.actionColor || "inherit"} // Use a valid color
         onClick={action.actionHandler}
+        sx={{
+          display: "flex",
+          flexDirection: "column", // Stacks the icon and label vertically
+          alignItems: "center", // Centers the icon and label horizontally
+          textTransform: "none", // Keeps the button label text as is
+        }}
       >
         {action.actionName}
       </Button>
@@ -628,50 +724,60 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Grid2 container sx={{ mt: 4 }} spacing={4}>
+      <Grid2 container sx={{ mt: 4 }} spacing={2}>
         <Grid2 size={12}>
-          <Stack spacing={2} direction="column">
-            <Paper>
-              <Stack sx={{ m: 1 }} spacing={1} direction="row">
-                <ExtraOptions
-                  handleFileLoad={handleLoadFile}
-                  handleCopy={handleCopy}
-                  handlePrint={handlePrint}
-                  handleSave={handleSave}
-                />
-                <Divider orientation="vertical" flexItem />
-                <Stack direction={"column"}>
-                  <Stack direction={"row"}>
-                    <ReadMore fontSize="small" />
-                    <Typography variant="overline" fontSize={8}>
-                      LABELS
-                    </Typography>
-                  </Stack>
-                  <Tooltip title="Button Label?">
-                    <Switch
-                      size="small"
-                      onChange={handleChange}
-                      checked={isLabeled}
-                    />
-                  </Tooltip>
-                </Stack>
-                <Divider orientation="vertical" flexItem />
-                <ButtonGroup disableElevation variant="text" size="small">
-                  {isLabeled ? actionButtons : actionIconButtons}
-                </ButtonGroup>
-              </Stack>
-            </Paper>
-            <Stack direction="row">
-              <Editor
-                theme={monacoTheme}
-                height={"70vh"}
-                defaultLanguage="json"
-                loading={<Skeleton variant="rounded" animation="wave" />}
-                defaultValue={JSON.stringify(editorData, null, 2)}
-                onMount={handleEditorDidMount}
+          <Paper>
+            <Stack sx={{ m: 1, p: 0.5 }} spacing={2} direction="row">
+              <ExtraOptions
+                handleFileLoad={handleLoadFile}
+                handleCopy={handleCopy}
+                handlePrint={handlePrint}
+                handleSave={handleSave}
               />
+              <Divider orientation="vertical" flexItem />
+              <Stack direction={"column"}>
+                <Stack direction={"row"}>
+                  <ReadMore fontSize="small" />
+                  <Typography variant="overline" fontSize={8}>
+                    LABELS
+                  </Typography>
+                </Stack>
+                <Tooltip title="Button Label?">
+                  <Switch
+                    size="small"
+                    onChange={handleChange}
+                    checked={isLabeled}
+                  />
+                </Tooltip>
+              </Stack>
+              <Divider orientation="vertical" flexItem />
+              <ButtonGroup
+                sx={{
+                  "& .MuiButton-root": {
+                    border: "none", // Remove border from each button
+                  },
+                  "& .MuiButtonGroup-grouped:not(:last-of-type)": {
+                    borderRight: "none", // Remove the dividing line between buttons
+                  },
+                }}
+                disableElevation
+                variant="text"
+                size="small"
+              >
+                {isLabeled ? actionButtons : actionIconButtons}
+              </ButtonGroup>
             </Stack>
-          </Stack>
+          </Paper>
+        </Grid2>
+        <Grid2 size={12}>
+          <Editor
+            theme={monacoTheme}
+            height={"70vh"}
+            defaultLanguage="json"
+            loading={<Skeleton variant="rounded" animation="wave" />}
+            defaultValue={JSON.stringify(editorData, null, 2)}
+            onMount={handleEditorDidMount}
+          />
         </Grid2>
       </Grid2>
     </Box>

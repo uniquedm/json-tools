@@ -149,7 +149,7 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={isDrawerOpen}>
-        <DrawerHeader>
+        <DrawerHeader sx={isDrawerOpen ? { opacity: 1 } : { opacity: 0 }}>
           <HomeRepairService fontSize="medium" color="inherit" />
           <Box sx={{ ml: 1 }}>
             {" "}

@@ -1,13 +1,23 @@
-# [JSON Tools](https://uniquedm.github.io/json-tools/)
+# JSON Tools
 
 A simple web application that provides various JSON tools to help you work with JSON data more effectively. The app includes features like JSON Formatting, JSON Path Evaluation, a JSON Viewer, and a Difference Editor for comparing JSON data.
+
+## Demo
+
+[Live Demo](https://uniquedm.github.io/json-tools/)
 
 ## Features
 
 - **JSON Formatting**: Easily format and beautify your JSON data for better readability.
-- **JSON Path Evaluation**: Extract specific data from JSON using JSONPath expressions.
+
+- **JSON Path Evaluation**: Extract specific data from JSON using JSONPath expressions. Provides autocompletion for possible JSON Path.
+
+- **JSON Schema Validation**: Validate / Edit your JSON Data against your JSON Schema.
 - **JSON Tree**: Visualize your JSON data in a tree view, making it easier to navigate through nested structures.
+
 - **Difference Editor**: Compare two sets of JSON data side by side to quickly identify differences.
+
+- **JWT Decode**: Decode your JWT Token into payload and headers.
 
 ### Built With
 
@@ -18,13 +28,14 @@ A simple web application that provides various JSON tools to help you work with 
   - [@mui/material](https://mui.com/)
   - [@mui/icons-material](https://mui.com/material-ui/material-icons/)
 - **Editor**: [@monaco-editor/react](https://www.npmjs.com/package/@monaco-editor/react)
+- **Routing**: [react-router-dom](https://reactrouter.com/)
 - **HTTP Client**: [axios](https://axios-http.com/)
 - **JSON Editor**: [json-edit-react](https://www.npmjs.com/package/json-edit-react)
 - **JSON Path**: [jsonpath-plus](https://www.npmjs.com/package/jsonpath-plus)
 - **JSON Repair**: [jsonrepair](https://www.npmjs.com/package/jsonrepair)
 - **JWT Decode**: [jwt-decode](https://www.npmjs.com/package/jwt-decode)
 - **JSON Schema Validator**: [ajv](https://www.npmjs.com/package/ajv)
-- **Routing**: [react-router-dom](https://reactrouter.com/)
+- **JSON Flatten / Unflatten**: [flat](https://www.npmjs.com/package/flat)
 
 ## Getting Started
 

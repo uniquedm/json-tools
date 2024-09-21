@@ -76,7 +76,13 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Paper elevation={4} sx={{ p: 2, m: 4 }}>
+      <Paper
+        elevation={4}
+        sx={{
+          p: 2,
+          m: 4,
+        }}
+      >
         <Grid2 container sx={{ mt: 2 }} spacing={4}>
           <Grid2 size={12}>
             <Stack spacing={2}>
@@ -120,7 +126,7 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
                   multiline
                   minRows={10}
                   value={JSON.stringify(decodedPayload, null, 2)}
-                  sx={{ width: "50vh" }}
+                  sx={{ width: "80%" }}
                   slotProps={{
                     input: {
                       readOnly: true,
@@ -149,7 +155,7 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
                   multiline
                   minRows={10}
                   value={JSON.stringify(decodedHeader, null, 2)}
-                  sx={{ width: "50vh" }}
+                  sx={{ width: "80%" }}
                   slotProps={{
                     input: {
                       readOnly: true,

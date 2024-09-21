@@ -1,22 +1,25 @@
 import { Editor, OnMount } from "@monaco-editor/react";
 import { Close, ContentCopy, Done, Help } from "@mui/icons-material";
 import {
+  Autocomplete,
   Box,
   Button,
+  CircularProgress,
   Divider,
   Grid2,
   IconButton,
-  InputBase,
   Modal,
   Paper,
   Skeleton,
   Stack,
+  styled,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -35,6 +38,52 @@ import {
 import ExtraOptions from "../features/ExtraOptions";
 import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
 
+function generateJsonPaths(
+  obj: any,
+  currentPath = "$",
+  includeWildcard = true
+) {
+  const paths = new Set();
+
+  function traverse(obj: any, currentPath: any) {
+    paths.add(currentPath);
+
+    if (typeof obj === "object" && obj !== null) {
+      if (Array.isArray(obj)) {
+        // Add wildcard path for the array
+        if (includeWildcard) {
+          const wildcardPath = `${currentPath}[*]`;
+          paths.add(wildcardPath);
+
+          // Generate paths for each element using both wildcard and specific index
+          for (let i = 0; i < obj.length; i++) {
+            const indexedPath = `${currentPath}[${i}]`;
+            traverse(obj[i], indexedPath);
+            traverse(obj[i], wildcardPath);
+          }
+        } else {
+          // Generate paths only for each specific index
+          for (let i = 0; i < obj.length; i++) {
+            const indexedPath = `${currentPath}[${i}]`;
+            traverse(obj[i], indexedPath);
+          }
+        }
+      } else {
+        // Iterate through each key for objects
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            const newPath = `${currentPath}.${key}`;
+            traverse(obj[key], newPath);
+          }
+        }
+      }
+    }
+  }
+
+  traverse(obj, currentPath);
+  return Array.from(paths).map((path) => ({ path })); // Convert set to array of objects with 'path'
+}
+
 export const JSONPathUtility: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
   theme = darkTheme,
@@ -43,17 +92,81 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   const jsonEditorTheme =
     theme === darkTheme ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
   // Initialize state for the input value
-  const [pathValue, setPathValue] = useState("$.objectField.nestedObject");
+  const [pathValue, setPathValue] = useState<any>("$");
+  const [queries, setQueries] = React.useState(
+    generateJsonPaths(defaultEditorJSON, "$", true)
+  );
 
   // Initialize state for the input value
   const [help, toggleHelp] = useState(false);
 
-  // Handle input change
-  const handleInputChange = (
+  const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [previousJSON, setPreviousJSON] = useState<string>(defaultEditorValue); // Store the previous JSON state
+
+  const handleOpen = () => {
+    setOpen(true);
+
+    (async () => {
+      setLoading(true);
+      if (!editorRef.current) {
+        console.warn("Editor is not ready.");
+        setLoading(false);
+        return;
+      }
+
+      const rawJson = editorRef.current.getValue();
+
+      // Compare with previous JSON state to check if it has changed
+      if (rawJson !== previousJSON) {
+        return;
+      }
+      try {
+        let currentJSON = JSON.parse(rawJson);
+        if (!currentJSON) currentJSON = {};
+
+        // Generate new queries based on the updated JSON content
+        const newQueries = generateJsonPaths(currentJSON, "$", true);
+        setQueries(newQueries);
+
+        // Update the previous JSON state
+        setPreviousJSON(rawJson);
+      } catch (error) {
+        console.error("Invalid JSON:", error);
+      }
+    })();
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setLoading(false);
+  };
+
+  // Handle input change for text field
+  const handleTextFieldChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setPathValue(event.target.value);
-    handleEvaluateWithInput(event.target.value);
+    const value = event.target.value;
+    setPathValue(value);
+    handleEvaluateWithInput(value);
+  };
+
+  // Handle input change for autocomplete selection
+  const handleAutocompleteChange = (
+    _event: React.SyntheticEvent,
+    newValue: unknown,
+    _reason:
+      | "createOption"
+      | "selectOption"
+      | "removeOption"
+      | "clear"
+      | "blur"
+      | "focus" = "selectOption",
+    _details?: any // You can type this more specifically if needed
+  ) => {
+    const value = newValue as string | null; // Type assertion
+    setPathValue(value);
+    handleEvaluateWithInput(value);
   };
 
   // Correctly type the editorRef to be a monaco editor instance or null
@@ -66,7 +179,11 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
     editorRef.current = editor;
   };
 
-  const handleEvaluateWithInput = (input: string): JsonData => {
+  const handleEvaluateWithInput = (input: any) => {
+    if (!input) {
+      setOutputJSON({});
+      return;
+    }
     let rawJson;
     if (!editorRef.current) {
       rawJson = defaultEditorValue;
@@ -76,13 +193,14 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
     const json = JSON.parse(rawJson);
     const result = JSONPath({ path: input, json });
     setOutputJSON(result);
-    return result;
   };
 
   const handleEvaluate = () => {
+    if (!pathValue) {
+      return;
+    }
     try {
-      const result = handleEvaluateWithInput(pathValue);
-      setOutputJSON(result);
+      handleEvaluateWithInput(pathValue);
     } catch (error) {
       setSnackbarConfig({
         open: true,
@@ -139,19 +257,53 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
                   p: "2px 4px",
                   display: "flex",
                   alignItems: "center",
-                  width: 400,
+                  width: "100%",
                 }}
               >
                 <ExtraOptions />
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                <InputBase
-                  sx={{ ml: 1, flex: 1 }}
-                  required
-                  placeholder="JSON Path Evaluate"
-                  value={pathValue}
-                  onChange={handleInputChange}
+                <Autocomplete
+                  id="JSON Path Query"
+                  open={open}
+                  onOpen={handleOpen}
+                  onClose={handleClose}
+                  onFocus={handleOpen} // Trigger on focus
+                  onAbort={handleClose}
+                  clearOnEscape={true}
+                  onClick={handleOpen} // Trigger on click
+                  loading={loading}
+                  freeSolo
+                  defaultValue={"$"}
                   fullWidth
-                  inputProps={{ "aria-label": "json path evaluate" }}
+                  PaperComponent={StyledPaper} // Apply custom Paper component for dropdown
+                  options={queries.map((option) => option.path)}
+                  onChange={handleAutocompleteChange} // Use dedicated handler
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      onChange={handleTextFieldChange} // Use dedicated handler for text input
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            border: "none", // Remove the border
+                          },
+                        },
+                      }}
+                      slotProps={{
+                        input: {
+                          ...params.InputProps,
+                          endAdornment: (
+                            <React.Fragment>
+                              {loading ? (
+                                <CircularProgress color="inherit" size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </React.Fragment>
+                          ),
+                        },
+                      }}
+                    />
+                  )}
                 />
                 <Tooltip title="Copy Expression">
                   <IconButton onClick={handleCopyExpression}>
@@ -207,6 +359,10 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
         onClose={handleHelpClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        sx={{
+          backdropFilter: "blur(1px)",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
       >
         <Box sx={modalStyle}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -225,8 +381,8 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
             <Table
               size="small"
               stickyHeader
-              sx={{ minWidth: 800 }}
-              aria-label="xpath to jsonpath table"
+              sx={{ minWidth: "auto", overflowX: "auto", maxWidth: "100%" }}
+              aria-label="xpath to jsonpath info table"
             >
               <TableHead>
                 <TableRow>
@@ -261,13 +417,20 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   );
 };
 
+const StyledPaper = styled(Paper)(({}) => ({
+  backgroundColor: "rgba(0, 0, 0, 0.1)",
+  backdropFilter: "blur(10px)",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+}));
+
 const modalStyle = {
   position: "absolute" as "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   bgcolor: "background.paper",
-  border: "2px solid #000",
   boxShadow: 24,
-  p: 4,
+  p: 2,
+  overflowX: "auto", // Enables horizontal scrolling
+  maxWidth: "100%", // Ensures the box doesn't exceed its parent's width
 };

@@ -1,6 +1,15 @@
 import { Editor } from "@monaco-editor/react";
 import { FactCheck } from "@mui/icons-material";
-import { Box, Button, Grid2, Paper, Skeleton, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Grid2,
+  Paper,
+  Skeleton,
+  Stack,
+  Switch,
+} from "@mui/material";
 import Ajv from "ajv";
 import * as monacoEditor from "monaco-editor";
 import React, { useRef, useState } from "react";
@@ -41,6 +50,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
   const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
   const [result, setResult] = useState<string | undefined>();
   const [isValid, setIsValid] = useState<boolean>(true);
+  const [allErrors, toggleAllErrors] = useState<boolean>(true);
 
   // References for Schema and Data editors
   const schemaEditorRef =
@@ -61,7 +71,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
   };
 
   // Instance of Ajv (Another JSON Schema Validator) for validation
-  const ajv = new Ajv();
+  const ajv = new Ajv({ allErrors: allErrors });
 
   // Function to generate watermark overlay for each editor
   const generateWaterMark = (text: string) => (
@@ -167,6 +177,19 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
                 >
                   Validate
                 </Button>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      title="Show all errors?"
+                      checked={allErrors}
+                      onChange={(_e, c) => toggleAllErrors(c)}
+                      inputProps={{
+                        "aria-label": "Show all errors?",
+                      }}
+                    />
+                  }
+                  label="Show all errors?"
+                />
               </Stack>
             </Paper>
           </Stack>
