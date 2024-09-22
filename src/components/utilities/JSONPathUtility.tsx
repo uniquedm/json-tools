@@ -282,6 +282,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
                     <TextField
                       {...params}
                       onChange={handleTextFieldChange} // Use dedicated handler for text input
+                      placeholder="JSON Path Expression..."
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           "& fieldset": {
@@ -377,7 +378,15 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
           >
             Learn More
           </Button>
-          <TableContainer component={Paper}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxHeight: 300, // Set max height for the table container
+              overflowY: "auto", // Enable vertical scrolling
+              overflowX: "auto", // Ensure horizontal scrolling if needed
+              marginBottom: 2, // Add some space at the bottom for the button
+            }}
+          >
             <Table
               size="small"
               stickyHeader
@@ -407,6 +416,14 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
               </TableBody>
             </Table>
           </TableContainer>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end", // Align the button to the right
+            }}
+          >
+            <Button onClick={() => toggleHelp(false)}>Close</Button>
+          </Box>
         </Box>
       </Modal>
       <SnackbarAlert

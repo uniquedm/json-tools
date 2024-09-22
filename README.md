@@ -36,6 +36,8 @@ A simple web application that provides various JSON tools to help you work with 
 - **JWT Decode**: [jwt-decode](https://www.npmjs.com/package/jwt-decode)
 - **JSON Schema Validator**: [ajv](https://www.npmjs.com/package/ajv)
 - **JSON Flatten / Unflatten**: [flat](https://www.npmjs.com/package/flat)
+- **Local Storage**: [react-use](https://www.npmjs.com/package/react-use)
+- **Draggable Dialogs**: [react-draggable](https://www.npmjs.com/package/react-draggable)
 
 ## Getting Started
 

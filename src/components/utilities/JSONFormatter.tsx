@@ -7,33 +7,41 @@ import {
   FormatPaint,
   LinearScale,
   PlaylistRemove,
-  ReadMore,
+  Settings,
   SortByAlpha,
   SwapVert,
 } from "@mui/icons-material";
 import {
   Box,
-  Button,
   ButtonGroup,
+  Checkbox,
   Divider,
+  FormControlLabel,
   Grid2,
   IconButton,
+  MenuItem,
   Paper,
   Skeleton,
   Stack,
-  Switch,
+  Tab,
+  Tabs,
+  TextField,
   Tooltip,
-  Typography,
 } from "@mui/material";
-import { flatten, unflatten } from "flat";
+import { flatten, FlattenOptions, unflatten, UnflattenOptions } from "flat";
 import { jsonrepair } from "jsonrepair";
 import * as monacoEditor from "monaco-editor";
-import React from "react";
+import React, { useState } from "react";
+import { useLocalStorage } from "react-use";
 import { defaultEditorJSON } from "../../data/Defaults";
 import { UtilityProps } from "../../data/DrawerData";
 import { darkTheme } from "../../data/Themes";
+import { Action } from "../commons/Interfaces";
 import { removeNullValues } from "../commons/JSONUtilities";
 import ExtraOptions from "../features/ExtraOptions";
+import MenuButton from "../features/MenuButton";
+import SettingsDialog from "../features/SettingsDialog";
+import TabPanel from "../features/VerticalTabs";
 
 export const JSONFormatter: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
@@ -45,6 +53,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   // Correctly type the editorRef to be a monaco editor instance or null
   const editorRef =
     React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+
+  const [settings, toggleSettings] = useState<boolean>(false);
 
   const handleEditorDidMount: OnMount = (editor, _monaco) => {
     editorRef.current = editor;
@@ -220,7 +230,14 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
     try {
       const parsedJson = JSON.parse(rawJson);
-      const flattenJson = flatten(parsedJson);
+      const flattenOptions: FlattenOptions = {
+        safe: flattenSafe,
+      };
+      if (flattenDepth) {
+        flattenOptions.maxDepth = flattenDepth;
+      }
+      flattenOptions.delimiter = flattenDelimiter || ".";
+      const flattenJson = flatten(parsedJson, flattenOptions);
       const prettyJson = JSON.stringify(flattenJson, null, 2);
       editorRef.current.setValue(prettyJson);
       if (setSnackbarConfig)
@@ -257,7 +274,16 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
     try {
       const parsedJson = JSON.parse(rawJson);
-      const prettyJson = JSON.stringify(unflatten(parsedJson), null, 2);
+      const unflattenOptions: UnflattenOptions = {
+        object: unflattenObject,
+        overwrite: unflattenOverwrite,
+      };
+      unflattenOptions.delimiter = flattenDelimiter || ".";
+      const prettyJson = JSON.stringify(
+        unflatten(parsedJson, unflattenOptions),
+        null,
+        2
+      );
       editorRef.current.setValue(prettyJson);
       if (setSnackbarConfig)
         setSnackbarConfig({
@@ -594,22 +620,6 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     window.print();
   };
 
-  // Define the Action interface
-  interface Action {
-    actionName: string;
-    actionDesc: string;
-    actionIcon: React.ReactNode;
-    actionHandler: () => void;
-    actionColor?:
-      | "inherit"
-      | "primary"
-      | "secondary"
-      | "success"
-      | "error"
-      | "info"
-      | "warning";
-  }
-
   // Define the actionList with correct typing
   const actionList: Action[] = [
     {
@@ -632,6 +642,18 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       actionIcon: <LinearScale />,
       actionHandler: handleFlattenJSON,
       actionColor: "primary",
+      menuOptions: (
+        <div>
+          <MenuItem>
+            <Checkbox
+              checked={true}
+              onChange={(e) => console.log(e.target.checked)}
+              inputProps={{ "aria-label": "Safe Mode" }}
+            />
+            Safe Mode
+          </MenuItem>
+        </div>
+      ),
     },
     {
       actionName: "Unflatten",
@@ -684,24 +706,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     },
   ];
 
-  // Map the actionList to JSX elements
   const actionButtons = actionList.map((action, index) => (
-    <Tooltip key={index} title={action.actionDesc}>
-      <Button
-        startIcon={action.actionIcon}
-        aria-label={action.actionDesc}
-        color={action.actionColor || "inherit"} // Use a valid color
-        onClick={action.actionHandler}
-        sx={{
-          display: "flex",
-          flexDirection: "column", // Stacks the icon and label vertically
-          alignItems: "center", // Centers the icon and label horizontally
-          textTransform: "none", // Keeps the button label text as is
-        }}
-      >
-        {action.actionName}
-      </Button>
-    </Tooltip>
+    <MenuButton key={index} action={action} />
   ));
 
   const actionIconButtons = actionList.map((action, index) => (
@@ -716,18 +722,219 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     </Tooltip>
   ));
 
-  const [isLabeled, toggleLabel] = React.useState(true);
+  const handleSettingsReset = () => {
+    // Default Values
+    toggleLabel(true);
+    setFlattenDelimiter(".");
+    toggleFlattenSafe(false);
+    removeFlattenDepth();
+    setFlattenDepth(undefined);
+    toggleUnflattenObject(false);
+    toggleUnflattenOverwrite(false);
+    toggleEditorMinimap(true);
+  };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [isLabeled, toggleLabel, _removeLabelConfig] = useLocalStorage(
+    "buttonLabels",
+    true
+  );
+
+  const handleLabelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     toggleLabel(event.target.checked);
   };
 
+  // Flatten / Unflatten
+  const [flattenDelimiter, setFlattenDelimiter, _removeFlattenDelimiter] =
+    useLocalStorage("flat-delimiter", "."); // Default delimiter is a period (.)
+
+  const handleDelimiterChange = (event: {
+    target: { value: React.SetStateAction<string | undefined> };
+  }) => {
+    setFlattenDelimiter(event.target.value); // Update delimiter based on user input
+  };
+
+  const [flattenSafe, toggleFlattenSafe, _removeFlattenSafe] = useLocalStorage(
+    "flat-safe",
+    false
+  );
+
+  const handleFlattenSafe = (event: React.ChangeEvent<HTMLInputElement>) => {
+    toggleFlattenSafe(event.target.checked);
+  };
+
+  const [flattenDepth, setFlattenDepth, removeFlattenDepth] = useLocalStorage<
+    undefined | number
+  >("flat-max-depth");
+
+  const handleDepthChange = (event: { target: { value: any } }) => {
+    const value = event.target.value;
+    setFlattenDepth(value === "" ? undefined : Number(value));
+  };
+
+  const [unflattenObject, toggleUnflattenObject, _removeUnflattenObject] =
+    useLocalStorage("flat-object", false);
+
+  const handleUnflattenObject = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    toggleUnflattenObject(event.target.checked);
+  };
+
+  const [
+    unflattenOverwrite,
+    toggleUnflattenOverwrite,
+    _removeUnflattenOverwrite,
+  ] = useLocalStorage("flat-overwrite", false);
+
+  const handleUnflattenOverwrite = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    toggleUnflattenOverwrite(event.target.checked);
+  };
+
+  const [editorMinimap, toggleEditorMinimap, _removeEditorMinimap] =
+    useLocalStorage("editor-minimap", true);
+  const handleEditorMinimap = (event: React.ChangeEvent<HTMLInputElement>) => {
+    toggleEditorMinimap(event.target.checked);
+  };
+
+  const handleSettingsOpen = () => {
+    toggleSettings(true);
+  };
+
+  const [tabIndex, setTabIndex] = React.useState(0);
+
+  const handleTabChange = (
+    _event: any,
+    newValue: React.SetStateAction<number>
+  ) => {
+    setTabIndex(newValue);
+  };
+
+  const settingTabs = (
+    <Box
+      sx={{
+        flexGrow: 1,
+        bgcolor: "background.paper",
+        display: "flex",
+        height: 256,
+        width: 512,
+      }}
+    >
+      <Tabs
+        orientation="vertical"
+        variant="scrollable"
+        value={tabIndex}
+        onChange={handleTabChange}
+        aria-label="Vertical tabs example"
+        sx={{ borderRight: 1, borderColor: "divider" }}
+      >
+        <Tab label="UI" {...a11yProps(0)} />
+        <Tab label="FLATTEN" {...a11yProps(1)} />
+        <Tab label="UNFLATTEN" {...a11yProps(2)} />
+        <Tab label="EDITOR" {...a11yProps(3)} />
+      </Tabs>
+      <TabPanel value={tabIndex} index={0}>
+        <Box>
+          {/* Label */}
+          <FormControlLabel
+            label="Button Label"
+            control={
+              <Checkbox
+                checked={isLabeled}
+                onChange={handleLabelChange}
+                value={isLabeled}
+              ></Checkbox>
+            }
+          />
+        </Box>
+      </TabPanel>
+      <TabPanel value={tabIndex} index={1}>
+        {/* Safe */}
+        <Stack spacing={1}>
+          <Tooltip title="When enabled, both flat and unflatten will preserve arrays and their contents">
+            <FormControlLabel
+              label="Safe"
+              control={
+                <Checkbox
+                  checked={flattenSafe}
+                  onChange={handleFlattenSafe}
+                  value={flattenSafe}
+                ></Checkbox>
+              }
+            />
+          </Tooltip>
+
+          <TextField
+            value={flattenDepth || ""} // Use an empty string if flattenDepth is undefined
+            onChange={handleDepthChange}
+            type="number"
+            label="Max Depth"
+            fullWidth
+            helperText="Max Depth for Flatten"
+          />
+          <TextField
+            value={flattenDelimiter}
+            onChange={handleDelimiterChange}
+            label="Delimiter"
+            fullWidth
+            helperText="Default delimiter is a period (.)"
+          />
+        </Stack>
+      </TabPanel>
+      <TabPanel value={tabIndex} index={2}>
+        <Tooltip title="When enabled, existing keys in the unflattened object may be overwritten if they cannot hold a newly encountered nested value">
+          <FormControlLabel
+            label="Overwrite"
+            control={
+              <Checkbox
+                checked={unflattenOverwrite}
+                onChange={handleUnflattenOverwrite}
+                value={unflattenOverwrite}
+              ></Checkbox>
+            }
+          />
+        </Tooltip>
+        <Tooltip title="When enabled, arrays will not be created automatically when calling unflatten">
+          <FormControlLabel
+            label="Object"
+            control={
+              <Checkbox
+                checked={unflattenObject}
+                onChange={handleUnflattenObject}
+                value={unflattenObject}
+              ></Checkbox>
+            }
+          />
+        </Tooltip>
+      </TabPanel>
+      <TabPanel value={tabIndex} index={3}>
+        <FormControlLabel
+          label="Minimap"
+          control={
+            <Checkbox
+              checked={editorMinimap}
+              onChange={handleEditorMinimap}
+              value={editorMinimap}
+            ></Checkbox>
+          }
+        />
+      </TabPanel>
+    </Box>
+  );
+
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <SettingsDialog
+        tabs={settingTabs}
+        open={settings}
+        setOpen={toggleSettings}
+        resetSettings={handleSettingsReset}
+      />
       <Grid2 container sx={{ mt: 4 }} spacing={2}>
         <Grid2 size={12}>
           <Paper>
-            <Stack sx={{ m: 1, p: 0.5 }} spacing={2} direction="row">
+            <Stack sx={{ m: 0, p: 0.5 }} spacing={1} direction="row">
               <ExtraOptions
                 handleFileLoad={handleLoadFile}
                 handleCopy={handleCopy}
@@ -735,21 +942,14 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                 handleSave={handleSave}
               />
               <Divider orientation="vertical" flexItem />
-              <Stack direction={"column"}>
-                <Stack direction={"row"}>
-                  <ReadMore fontSize="small" />
-                  <Typography variant="overline" fontSize={8}>
-                    LABELS
-                  </Typography>
-                </Stack>
-                <Tooltip title="Button Label?">
-                  <Switch
-                    size="small"
-                    onChange={handleChange}
-                    checked={isLabeled}
-                  />
-                </Tooltip>
-              </Stack>
+              <Tooltip title="Settings">
+                <IconButton
+                  sx={{ height: "40px", width: "40px" }}
+                  onClick={handleSettingsOpen}
+                >
+                  <Settings />
+                </IconButton>
+              </Tooltip>
               <Divider orientation="vertical" flexItem />
               <ButtonGroup
                 sx={{
@@ -774,6 +974,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
             theme={monacoTheme}
             height={"70vh"}
             defaultLanguage="json"
+            options={{ minimap: { enabled: editorMinimap } }}
             loading={<Skeleton variant="rounded" animation="wave" />}
             defaultValue={JSON.stringify(editorData, null, 2)}
             onMount={handleEditorDidMount}
@@ -783,3 +984,10 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     </Box>
   );
 };
+
+function a11yProps(index: number) {
+  return {
+    id: `vertical-tab-${index}`,
+    "aria-controls": `vertical-tabpanel-${index}`,
+  };
+}

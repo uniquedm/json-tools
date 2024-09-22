@@ -108,7 +108,9 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
                     control={
                       <Checkbox
                         checked={decodeHeader}
-                        onChange={(e) => setDecodeHeader(e.target.checked)}
+                        onChange={(e) => {
+                          setDecodeHeader(e.target.checked);
+                        }}
                       />
                     }
                     label="Decode JWT Header"
