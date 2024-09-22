@@ -21,14 +21,14 @@ import {
 } from "@mui/material";
 import { JsonEditor } from "json-edit-react";
 import React from "react";
-import { defaultEditorJSON } from "../../data/Defaults";
-import { UtilityProps } from "../../data/DrawerData";
+import ExtraOptions from "../components/menus/ExtraOptions";
+import { defaultEditorJSON } from "../data/Defaults";
 import {
   darkTheme,
   jsonEditCustomDarkTheme,
   jsonEditCustomTheme,
-} from "../../data/Themes";
-import ExtraOptions from "../features/ExtraOptions";
+} from "../data/Themes";
+import { UtilityProps } from "../types/DrawerTypes";
 
 interface JSONEditAction {
   actionName: string;

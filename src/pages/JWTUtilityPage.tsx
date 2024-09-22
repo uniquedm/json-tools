@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { useState } from "react";
-import { UtilityProps } from "../../data/DrawerData";
+import { UtilityProps } from "../types/DrawerTypes";
 
 export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
   const [token, setToken] = useState(

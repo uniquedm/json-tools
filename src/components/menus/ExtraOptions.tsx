@@ -8,7 +8,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { alpha, styled } from "@mui/material/styles";
 import * as React from "react";
 
-interface SpeedDialButtonProps {
+interface ExtraOptionsProps {
   handleFileLoad?: () => void;
   handleCopy?: () => void;
   handleSave?: () => void;
@@ -20,7 +20,7 @@ export default function ExtraOptions({
   handleCopy,
   handleSave,
   handlePrint,
-}: SpeedDialButtonProps) {
+}: ExtraOptionsProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

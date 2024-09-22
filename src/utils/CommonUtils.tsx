@@ -1,8 +1,8 @@
 import React from "react";
-import { Utility } from "../../data/DrawerData";
+import { UtilityDetails } from "../types/DrawerTypes";
 
 // Function to render the component with its props
-export default function renderUtility(utility: Utility, props: any) {
+export default function renderUtility(utility: UtilityDetails, props: any) {
   if (!utility) {
     return null;
   }

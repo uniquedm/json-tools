@@ -1,5 +1,4 @@
-import { HomeRepairService } from "@mui/icons-material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { HomeRepairService, MenuOpen } from "@mui/icons-material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Stack, Tooltip } from "@mui/material";
@@ -17,14 +16,14 @@ import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { defaultEditorJSON } from "../data/Defaults";
-import { Utility } from "../data/DrawerData";
-import { ThemeInput } from "../data/Themes";
-import { extraUtilities, mainUtilities } from "../data/Utilities";
-import renderUtility from "./commons/CommonUtilities";
-import DarkModeSwitch from "./features/DarkModeSwitch";
-import GithubStarCount from "./features/GithubStarCount";
-import SnackbarAlert, { SnackbarConfig } from "./features/SnackbarAlert";
+import { defaultEditorJSON } from "../../data/Defaults";
+import { ThemeInput } from "../../data/Themes";
+import { extraUtilities, mainUtilities } from "../../data/Utilities";
+import { UtilityDetails } from "../../types/DrawerTypes";
+import renderUtility from "../../utils/CommonUtils";
+import DarkModeSwitch from "../navbar/DarkModeSwitch";
+import GithubStarCount from "../navbar/GithubStarCount";
+import SnackbarAlert, { SnackbarConfig } from "../SnackbarAlert";
 
 export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
   const theme = useTheme();
@@ -47,7 +46,7 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
   };
 
   const drawerListItems = (
-    utilityMap: { [key: string]: Utility },
+    utilityMap: { [key: string]: UtilityDetails },
     open: any,
     currentUtility: any,
     setCurrentUtility: any
@@ -158,11 +157,7 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
             </Typography>
           </Box>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
+            {theme.direction === "rtl" ? <ChevronRightIcon /> : <MenuOpen />}
           </IconButton>
         </DrawerHeader>
         <Divider />

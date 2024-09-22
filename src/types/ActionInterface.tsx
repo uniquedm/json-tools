@@ -11,5 +11,4 @@ export interface Action {
     | "error"
     | "info"
     | "warning";
-  menuOptions?: React.ReactNode; // Optional property for additional menu options
 }

@@ -13,9 +13,9 @@ import {
 import Ajv from "ajv";
 import * as monacoEditor from "monaco-editor";
 import React, { useRef, useState } from "react";
-import { UtilityProps } from "../../data/DrawerData";
-import { darkTheme } from "../../data/Themes";
-import ExtraOptions from "../features/ExtraOptions";
+import ExtraOptions from "../components/menus/ExtraOptions";
+import { darkTheme } from "../data/Themes";
+import { UtilityProps } from "../types/DrawerTypes";
 
 // Constants for editor types
 const SCHEMA = "SCHEMA";

@@ -27,16 +27,16 @@ import { JsonData, JsonEditor } from "json-edit-react";
 import { JSONPath } from "jsonpath-plus";
 import * as monacoEditor from "monaco-editor";
 import React, { useEffect, useState } from "react";
-import { jsonPathHelpData } from "../../data/Constants";
-import { defaultEditorJSON, defaultEditorValue } from "../../data/Defaults";
-import { UtilityProps } from "../../data/DrawerData";
+import ExtraOptions from "../components/menus/ExtraOptions";
+import SnackbarAlert, { SnackbarConfig } from "../components/SnackbarAlert";
+import { jsonPathHelpData } from "../data/Constants";
+import { defaultEditorJSON, defaultEditorValue } from "../data/Defaults";
 import {
   darkTheme,
   jsonEditCustomDarkTheme,
   jsonEditCustomTheme,
-} from "../../data/Themes";
-import ExtraOptions from "../features/ExtraOptions";
-import SnackbarAlert, { SnackbarConfig } from "../features/SnackbarAlert";
+} from "../data/Themes";
+import { UtilityProps } from "../types/DrawerTypes";
 
 function generateJsonPaths(
   obj: any,

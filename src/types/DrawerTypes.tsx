@@ -1,8 +1,8 @@
 import { Theme } from "@mui/material";
 import { Dispatch, SetStateAction } from "react";
-import { SnackbarConfig } from "../components/features/SnackbarAlert";
+import { SnackbarConfig } from "../components/SnackbarAlert";
 
-export interface Utility<Props = any> {
+export interface UtilityDetails<Props = any> {
   component: React.ReactElement<Props>; // Component that can accept props dynamically
   navIcon: JSX.Element; // Icon for the navigation
   isOpen: boolean; // Whether the utility is open

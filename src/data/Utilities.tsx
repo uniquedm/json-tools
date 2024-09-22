@@ -6,20 +6,13 @@ import {
   ManageSearch,
   Security,
 } from "@mui/icons-material";
-import { DifferenceUtility } from "../components/utilities/DifferenceUtility";
-import { JSONFormatter } from "../components/utilities/JSONFormatter";
-import { JSONPathUtility } from "../components/utilities/JSONPathUtility";
-import { JSONSchemaValidator } from "../components/utilities/JSONSchemaValidator";
-import { JSONTreeViewer } from "../components/utilities/JSONTreeViewer";
-import { JWTUtility } from "../components/utilities/JWTUtility";
-
-export interface Utility {
-  component: JSX.Element;
-  navIcon: JSX.Element;
-  isOpen: boolean;
-  tooltip: string;
-  toolName: string;
-}
+import { DifferenceUtility } from "../pages/DifferenceUtilityPage";
+import { JSONFormatter } from "../pages/JSONFormatterPage";
+import { JSONPathUtility } from "../pages/JSONPathUtilityPage";
+import { JSONSchemaValidator } from "../pages/JSONSchemaPage";
+import { JSONTreeViewer } from "../pages/JSONTreeViewerPage";
+import { JWTUtility } from "../pages/JWTUtilityPage";
+import { Utility } from "../types/UtilityInterace";
 
 export const mainUtilities: { [key: string]: Utility } = {
   FORMAT: {

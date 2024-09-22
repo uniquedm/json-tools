@@ -4,7 +4,7 @@ import { SetStateAction, useState } from "react";
 import { Route, HashRouter as Router, Routes } from "react-router-dom";
 import { useLocalStorage } from "react-use";
 import "./App.css";
-import AppDrawer from "./components/AppDrawer";
+import AppDrawer from "./components/drawer/AppDrawer";
 import { darkTheme, lightTheme } from "./data/Themes";
 
 function Home() {

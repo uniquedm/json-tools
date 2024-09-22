@@ -1,6 +1,6 @@
 import { Button, Stack, Tooltip } from "@mui/material";
 import React from "react";
-import { Action } from "../commons/Interfaces";
+import { Action } from "../types/ActionInterface";
 
 interface MenuButtonProps {
   action: Action;

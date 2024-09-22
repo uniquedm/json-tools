@@ -12,11 +12,11 @@ import {
   Stack,
 } from "@mui/material";
 import React from "react";
-import { supportedLanguages } from "../../data/Constants";
-import { defaultEditorValue, defaultModifiedValue } from "../../data/Defaults";
-import { UtilityProps } from "../../data/DrawerData";
-import { darkTheme } from "../../data/Themes";
-import ExtraOptions from "../features/ExtraOptions";
+import ExtraOptions from "../components/menus/ExtraOptions";
+import { supportedLanguages } from "../data/Constants";
+import { defaultEditorValue, defaultModifiedValue } from "../data/Defaults";
+import { darkTheme } from "../data/Themes";
+import { UtilityProps } from "../types/DrawerTypes";
 
 export const DifferenceUtility: React.FC<UtilityProps> = ({
   theme = darkTheme,
