@@ -118,7 +118,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
       const rawJson = editorRef.current.getValue();
 
       // Compare with previous JSON state to check if it has changed
-      if (rawJson !== previousJSON) {
+      if (rawJson === previousJSON) {
         return;
       }
       try {
