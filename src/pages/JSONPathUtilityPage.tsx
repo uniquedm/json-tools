@@ -37,6 +37,12 @@ import {
   jsonEditCustomTheme,
 } from "../data/Themes";
 import { UtilityProps } from "../types/DrawerTypes";
+import {
+  copyToClipboard,
+  loadFile,
+  printDocument,
+  saveFile,
+} from "../utils/EditorOptions";
 
 function generateJsonPaths(
   obj: any,
@@ -87,6 +93,7 @@ function generateJsonPaths(
 export const JSONPathUtility: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
   theme = darkTheme,
+  setEditorData,
 }) => {
   const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
   const jsonEditorTheme =
@@ -240,6 +247,22 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
       });
   };
 
+  const handleCopy = () => {
+    copyToClipboard(editorRef, setSnackbarConfig);
+  };
+
+  const handleSave = () => {
+    saveFile(editorRef, setSnackbarConfig);
+  };
+
+  const handleLoadFile = () => {
+    loadFile(editorRef, setSnackbarConfig, setEditorData);
+  };
+
+  const handlePrint = () => {
+    printDocument();
+  };
+
   // Snackbar Configuration
   const [snackbarConfig, setSnackbarConfig] = useState<SnackbarConfig>({
     open: false,
@@ -260,7 +283,12 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
                   width: "100%",
                 }}
               >
-                <ExtraOptions />
+                <ExtraOptions
+                  handleFileLoad={handleLoadFile}
+                  handleCopy={handleCopy}
+                  handlePrint={handlePrint}
+                  handleSave={handleSave}
+                />
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                 <Autocomplete
                   id="JSON Path Query"
