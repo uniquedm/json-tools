@@ -38,6 +38,7 @@ A simple web application that provides various JSON tools to help you work with 
 - **JSON Flatten / Unflatten**: [flat](https://www.npmjs.com/package/flat)
 - **Local Storage**: [react-use](https://www.npmjs.com/package/react-use)
 - **Draggable Dialogs**: [react-draggable](https://www.npmjs.com/package/react-draggable)
+- **React Helmet**: [react-helmet](https://www.npmjs.com/package/react-helmet)
 
 ## Getting Started
 
