@@ -1,4 +1,4 @@
-import { Button, Stack, Tooltip } from "@mui/material";
+import { Button, Stack, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { Action } from "../types/ActionInterface";
 
@@ -27,7 +27,9 @@ const MenuButton = React.forwardRef<HTMLDivElement, MenuButtonProps>(
                 textTransform: "none",
               }}
             >
-              {action.actionName}
+              <Typography variant="button" fontSize={10}>
+                {action.actionName}
+              </Typography>
             </Button>
           </Tooltip>
         </Stack>

@@ -1,15 +1,17 @@
 import { Editor, OnMount } from "@monaco-editor/react";
-import { Settings } from "@mui/icons-material";
+import { AccountTree, DataObject, Settings } from "@mui/icons-material";
 import {
   Box,
   ButtonGroup,
   Divider,
+  Fab,
   Grid2,
   IconButton,
   Paper,
   Skeleton,
   Stack,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import * as monacoEditor from "monaco-editor";
 import React, { useState } from "react";
@@ -19,7 +21,11 @@ import { settingTabs } from "../components/menus/JSONFormatterSettings";
 import SettingsDialog from "../components/menus/SettingsDialog";
 import { createActionList } from "../data/ActionsList";
 import { defaultEditorJSON } from "../data/Defaults";
-import { darkTheme } from "../data/Themes";
+import {
+  darkTheme,
+  jsonEditCustomDarkTheme,
+  jsonEditCustomTheme,
+} from "../data/Themes";
 import { UtilityProps } from "../types/DrawerTypes";
 import { JSONFormatterSettings } from "../types/JSONFormatSettingInterface";
 import { actionButtons, actionIconButtons } from "../utils/ActionButtonsMapper";
@@ -41,6 +47,7 @@ import {
   unescapeJSONFunction,
   unflattenJSON,
 } from "../utils/JSONFormatUtils";
+import { jsonTreeEditor } from "./JSONTreeViewerPage";
 
 export const JSONFormatter: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
@@ -53,6 +60,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   const editorRef =
     React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
 
+  const [isTreeView, setTreeView] = useState(false);
+
   const [settings, toggleSettings] = useState<boolean>(false);
 
   const handleEditorDidMount: OnMount = (editor, _monaco) => {
@@ -60,26 +69,32 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   };
 
   const handleRemoveNullValues = () => {
+    setTreeView(false);
     removeNullValuesJSON(editorRef, setSnackbarConfig);
   };
 
   const handleRepairValues = () => {
+    setTreeView(false);
     repairJSON(editorRef, setSnackbarConfig);
   };
 
   const handleUnescapeJSON = () => {
+    setTreeView(false);
     unescapeJSONFunction(editorRef, setSnackbarConfig);
   };
 
   const handleEscapeJSON = () => {
+    setTreeView(false);
     escapeJSON(editorRef, setSnackbarConfig);
   };
 
   const handleCompactJSON = () => {
+    setTreeView(false);
     compactJSON(editorRef, setSnackbarConfig);
   };
 
   const handleFlattenJSON = () => {
+    setTreeView(false);
     flattenJSON(
       editorRef,
       setSnackbarConfig,
@@ -90,6 +105,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   };
 
   const handleUnflattenJSON = () => {
+    setTreeView(false);
     unflattenJSON(
       editorRef,
       setSnackbarConfig,
@@ -100,14 +116,17 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   };
 
   const handleFormatJSON = () => {
+    setTreeView(false);
     formatJSON(editorRef, setSnackbarConfig);
   };
 
   const handleSortJSON = () => {
+    setTreeView(false);
     sortJSON(editorRef, setSnackbarConfig);
   };
 
   const handleReverseJSON = () => {
+    setTreeView(false);
     reverseJSON(editorRef, setSnackbarConfig);
   };
 
@@ -120,11 +139,16 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   };
 
   const handleLoadFile = () => {
+    setTreeView(false);
     loadFile(editorRef, setSnackbarConfig, setEditorData);
   };
 
   const handlePrint = () => {
     printDocument();
+  };
+
+  const toggleTreeView = () => {
+    setTreeView((prevValue) => !prevValue);
   };
 
   const actionList = createActionList({
@@ -237,6 +261,39 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     handleEditorMinimap: handleEditorMinimap,
   };
 
+  const jsonEditorTheme =
+    theme.palette.mode === "dark"
+      ? jsonEditCustomDarkTheme
+      : jsonEditCustomTheme;
+
+  const getTreeView = () => {
+    if (!editorRef.current) {
+      console.warn("Editor is not ready.");
+      return;
+    }
+
+    const rawJson = editorRef.current.getValue();
+    if (!rawJson.trim()) {
+      console.warn("Editor content is empty.");
+      return;
+    }
+
+    try {
+      const parsedJson = JSON.parse(rawJson);
+      return jsonTreeEditor(true, 99, [], jsonEditorTheme, parsedJson);
+    } catch (error) {
+      if (setSnackbarConfig) {
+        setTreeView(false);
+        setSnackbarConfig({
+          open: true,
+          severity: "error",
+          message: `Invalid JSON: ${error}`,
+          duration: 4000,
+        });
+      }
+    }
+  };
+
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       <SettingsDialog
@@ -286,15 +343,65 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
           </Paper>
         </Grid2>
         <Grid2 size={12}>
-          <Editor
-            theme={monacoTheme}
-            height={"70vh"}
-            defaultLanguage="json"
-            options={{ minimap: { enabled: editorMinimap } }}
-            loading={<Skeleton variant="rounded" animation="wave" />}
-            defaultValue={JSON.stringify(editorData, null, 2)}
-            onMount={handleEditorDidMount}
-          />
+          <Box sx={{ position: "relative" }}>
+            {" "}
+            {/* Set Box to relative positioning */}
+            {!isTreeView && (
+              <Editor
+                theme={monacoTheme}
+                height={"70vh"}
+                defaultLanguage="json"
+                options={{ minimap: { enabled: editorMinimap } }}
+                loading={<Skeleton variant="rounded" animation="wave" />}
+                defaultValue={JSON.stringify(editorData, null, 2)}
+                onMount={handleEditorDidMount}
+              />
+            )}
+            {isTreeView && getTreeView()}
+            {/* Add Tooltip and Fab */}
+            <Tooltip title={isTreeView ? "JSON Editor" : "Tree Viewer"}>
+              <Fab
+                color="primary"
+                size="small"
+                variant="extended"
+                onClick={toggleTreeView}
+                sx={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)", // Set semi-transparent background
+                  backdropFilter: "blur(1px)", // Optional: Add blur effect to background
+                  color: "white", // Ensure text/icon color contrasts well
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.3)", // Slightly less transparent on hover
+                  },
+                }}
+              >
+                {isTreeView ? (
+                  <DataObject
+                    sx={{
+                      color: theme.palette.text.primary,
+                    }}
+                  />
+                ) : (
+                  <AccountTree
+                    sx={{
+                      color: theme.palette.text.primary,
+                    }}
+                  />
+                )}
+                <Typography
+                  sx={{
+                    ml: "0.5rem",
+                    color: theme.palette.text.primary,
+                  }}
+                  variant="overline"
+                >
+                  {isTreeView ? "Editor" : "View"}
+                </Typography>
+              </Fab>
+            </Tooltip>
+          </Box>
         </Grid2>
       </Grid2>
     </Box>

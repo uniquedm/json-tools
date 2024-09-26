@@ -10,6 +10,7 @@ import {
   SelectChangeEvent,
   Skeleton,
   Stack,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import ExtraOptions from "../components/menus/ExtraOptions";
@@ -30,7 +31,7 @@ export const DifferenceUtility: React.FC<UtilityProps> = ({
 
   const languageMenu = supportedLanguages.map((languageName) => (
     <MenuItem key={languageName} value={languageName}>
-      {languageName}
+      <Typography variant="overline">{languageName}</Typography>
     </MenuItem>
   ));
 

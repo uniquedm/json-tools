@@ -53,20 +53,6 @@ export const createActionList = (handlers: {
       actionColor: "primary",
     },
     {
-      actionName: "Sort",
-      actionDesc: "Sort JSON",
-      actionIcon: <SortByAlpha />,
-      actionHandler: handlers.handleSortJSON,
-      actionColor: "secondary",
-    },
-    {
-      actionName: "Reverse",
-      actionDesc: "Reverse JSON",
-      actionIcon: <SwapVert />,
-      actionHandler: handlers.handleReverseJSON,
-      actionColor: "secondary",
-    },
-    {
       actionName: "Repair",
       actionDesc: "Repair JSON",
       actionIcon: <AutoFixHigh />,
@@ -86,6 +72,20 @@ export const createActionList = (handlers: {
       actionIcon: <FormatPaint />,
       actionHandler: handlers.handleEscapeJSON,
       actionColor: "success",
+    },
+    {
+      actionName: "Sort",
+      actionDesc: "Sort JSON",
+      actionIcon: <SortByAlpha />,
+      actionHandler: handlers.handleSortJSON,
+      actionColor: "secondary",
+    },
+    {
+      actionName: "Reverse",
+      actionDesc: "Reverse JSON",
+      actionIcon: <SwapVert />,
+      actionHandler: handlers.handleReverseJSON,
+      actionColor: "secondary",
     },
     {
       actionName: "Remove Null",

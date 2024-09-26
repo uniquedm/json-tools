@@ -135,27 +135,75 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
           </Stack>
         </Grid2>
         <Grid2 size={12}>
-          <JsonEditor
-            showCollectionCount={showCount}
-            collapse={collapseLevel}
-            enableClipboard
-            minWidth={"100%"}
-            icons={{
-              add: <Add />,
-              edit: <Edit />,
-              delete: <Delete />,
-              copy: <ContentCopy />,
-              ok: <Done />,
-              cancel: <Close />,
-            }}
-            restrictEdit={!options.includes("Edit")}
-            restrictAdd={!options.includes("Add")}
-            restrictDelete={!options.includes("Delete")}
-            theme={jsonEditorTheme}
-            data={editorData}
-          />
+          {jsonTreeEditor(
+            showCount,
+            collapseLevel,
+            options,
+            jsonEditorTheme,
+            editorData
+          )}
         </Grid2>
       </Grid2>
     </Box>
   );
 };
+
+export function jsonTreeEditor(
+  showCount: boolean,
+  collapseLevel: number,
+  options: string[],
+  jsonEditorTheme: {
+    displayName: string;
+    styles: {
+      container: {
+        backgroundColor: string;
+        fontFamily: string;
+        borderRadius: number;
+      };
+    };
+  },
+  editorData:
+    | Record<string, any>
+    | {
+        stringField: string;
+        numberField: number;
+        booleanField: boolean;
+        nullField: null;
+        arrayField: (
+          | string
+          | number
+          | boolean
+          | { nestedObject: string }
+          | null
+        )[];
+        objectField: {
+          nestedString: string;
+          nestedNumber: number;
+          nestedBoolean: boolean;
+          nestedArray: number[];
+          nestedObject: { deepNestedField: string };
+        };
+      }
+) {
+  return (
+    <JsonEditor
+      showCollectionCount={showCount}
+      collapse={collapseLevel}
+      enableClipboard
+      minWidth={"100%"}
+      icons={{
+        add: <Add />,
+        edit: <Edit />,
+        delete: <Delete />,
+        copy: <ContentCopy />,
+        ok: <Done />,
+        cancel: <Close />,
+      }}
+      restrictEdit={!options.includes("Edit")}
+      restrictAdd={!options.includes("Add")}
+      restrictDelete={!options.includes("Delete")}
+      theme={jsonEditorTheme}
+      data={editorData}
+    />
+  );
+}

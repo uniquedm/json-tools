@@ -2,7 +2,7 @@ import { FileOpen, MoreVert } from "@mui/icons-material";
 import FileCopyIcon from "@mui/icons-material/FileCopyOutlined";
 import PrintIcon from "@mui/icons-material/Print";
 import SaveIcon from "@mui/icons-material/Save";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip, Typography } from "@mui/material";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { alpha, styled } from "@mui/material/styles";
@@ -53,7 +53,7 @@ export default function ExtraOptions({
       }}
     >
       {action.icon}
-      {action.name}
+      <Typography variant="overline">{action.name}</Typography>
     </MenuItem>
   ));
 

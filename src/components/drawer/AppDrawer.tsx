@@ -111,6 +111,9 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
                         opacity: 0,
                       },
                 ]}
+                primaryTypographyProps={{
+                  variant: "button", // Apply your desired typography variant
+                }}
               />
             </ListItemButton>
           </ListItem>
@@ -138,7 +141,13 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
             <MenuIcon />
           </IconButton>
           {currentUtility["navIcon"]}
-          <Typography sx={{ ml: "1rem" }} variant="h6" noWrap component="h6">
+          <Typography
+            sx={{ ml: "1rem" }}
+            variant="button"
+            fontSize={16}
+            noWrap
+            component="h6"
+          >
             {currentUtility["toolName"]}
           </Typography>
           <Stack sx={{ ml: "auto" }} direction="row">

@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/material";
+import { Typography, useTheme } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -65,7 +65,9 @@ export default function SettingsDialog({
           }}
           id="draggable-dialog-title"
         >
-          Settings
+          <Typography fontSize={"1.2rem"} variant="overline">
+            Settings
+          </Typography>
         </DialogTitle>
         {tabs}
         <DialogActions

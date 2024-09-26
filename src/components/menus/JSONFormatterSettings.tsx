@@ -7,6 +7,7 @@ import {
   Tabs,
   TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import { JSONFormatterSettings } from "../../types/JSONFormatSettingInterface";
@@ -71,7 +72,7 @@ export const settingTabs = ({
         <Box>
           {/* Label */}
           <FormControlLabel
-            label="Button Label"
+            label={<Typography variant="overline">LABELS</Typography>}
             control={
               <Checkbox
                 checked={isLabeled}
@@ -87,7 +88,7 @@ export const settingTabs = ({
         <Stack spacing={1}>
           <Tooltip title="When enabled, both flat and unflatten will preserve arrays and their contents">
             <FormControlLabel
-              label="Safe"
+              label={<Typography variant="overline">Safe</Typography>}
               control={
                 <Checkbox
                   checked={flattenSafe}
@@ -102,23 +103,31 @@ export const settingTabs = ({
             value={flattenDepth || ""} // Use an empty string if flattenDepth is undefined
             onChange={handleDepthChange}
             type="number"
-            label="Max Depth"
+            label={<Typography variant="button">Max Depth</Typography>}
             fullWidth
-            helperText="Max Depth for Flatten"
+            helperText={
+              <Typography fontSize={8} variant="overline">
+                Max Depth for Flatten
+              </Typography>
+            }
           />
           <TextField
             value={flattenDelimiter}
             onChange={handleDelimiterChange}
-            label="Delimiter"
+            label={<Typography variant="overline">Delimiter</Typography>}
             fullWidth
-            helperText="Default delimiter is a period (.)"
+            helperText={
+              <Typography fontSize={8} variant="overline">
+                Default delimiter is a period (.)
+              </Typography>
+            }
           />
         </Stack>
       </TabPanel>
       <TabPanel value={tabIndex} index={2}>
         <Tooltip title="When enabled, existing keys in the unflattened object may be overwritten if they cannot hold a newly encountered nested value">
           <FormControlLabel
-            label="Overwrite"
+            label={<Typography variant="overline">Overwrite</Typography>}
             control={
               <Checkbox
                 checked={unflattenOverwrite}
@@ -130,7 +139,7 @@ export const settingTabs = ({
         </Tooltip>
         <Tooltip title="When enabled, arrays will not be created automatically when calling unflatten">
           <FormControlLabel
-            label="Object"
+            label={<Typography variant="overline">Object</Typography>}
             control={
               <Checkbox
                 checked={unflattenObject}
@@ -143,7 +152,7 @@ export const settingTabs = ({
       </TabPanel>
       <TabPanel value={tabIndex} index={3}>
         <FormControlLabel
-          label="Minimap"
+          label={<Typography variant="overline">Minimap</Typography>}
           control={
             <Checkbox
               checked={editorMinimap}

@@ -9,6 +9,7 @@ import {
   Skeleton,
   Stack,
   Switch,
+  Typography,
 } from "@mui/material";
 import Ajv from "ajv";
 import * as monacoEditor from "monaco-editor";
@@ -188,7 +189,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
                       }}
                     />
                   }
-                  label="Show all errors?"
+                  label={<Typography variant="overline">ALL ERRORS</Typography>}
                 />
               </Stack>
             </Paper>

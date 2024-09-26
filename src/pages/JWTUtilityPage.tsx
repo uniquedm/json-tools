@@ -10,6 +10,7 @@ import {
   Stack,
   TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { useState } from "react";
@@ -113,7 +114,11 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
                         }}
                       />
                     }
-                    label="Decode JWT Header"
+                    label={
+                      <Typography variant="overline">
+                        Decode JWT Header
+                      </Typography>
+                    }
                   />
                 </Box>
               </Stack>
@@ -124,7 +129,9 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
               <Box sx={{ position: "relative" }}>
                 <TextField
                   id="outlined-textarea"
-                  label="Decoded Payload"
+                  label={
+                    <Typography variant="button">Decoded Payload</Typography>
+                  }
                   multiline
                   minRows={10}
                   value={JSON.stringify(decodedPayload, null, 2)}
@@ -153,7 +160,9 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
               <Box sx={{ position: "relative" }}>
                 <TextField
                   id="outlined-textarea"
-                  label="Decoded Header"
+                  label={
+                    <Typography variant="button">Decoded Header</Typography>
+                  }
                   multiline
                   minRows={10}
                   value={JSON.stringify(decodedHeader, null, 2)}
