@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { useSessionStorage } from "react-use";
 import ExtraOptions from "../components/menus/ExtraOptions";
 import { supportedLanguages } from "../data/Constants";
 import { defaultEditorValue, defaultModifiedValue } from "../data/Defaults";
@@ -34,6 +35,16 @@ export const DifferenceUtility: React.FC<UtilityProps> = ({
       <Typography variant="overline">{languageName}</Typography>
     </MenuItem>
   ));
+
+  const [originalData, _setOriginalData] = useSessionStorage(
+    "diff-original",
+    defaultEditorValue
+  );
+
+  const [modifiedData, _setModifiedData] = useSessionStorage(
+    "diff-modified",
+    defaultModifiedValue
+  );
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -64,8 +75,8 @@ export const DifferenceUtility: React.FC<UtilityProps> = ({
         <DiffEditor
           language={editorLanguage}
           theme={monacoTheme}
-          original={defaultEditorValue}
-          modified={defaultModifiedValue}
+          original={originalData}
+          modified={modifiedData}
           options={{
             originalEditable: true,
           }}

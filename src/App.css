@@ -3,3 +3,16 @@
   padding: 2rem;
   text-align: center;
 }
+.node {
+  height: 150px;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  border-radius: 10px;
+}
+
+.handle {
+  position: relative;
+  top: 15px;
+}

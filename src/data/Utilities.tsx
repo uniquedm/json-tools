@@ -5,12 +5,14 @@ import {
   FactCheck,
   ManageSearch,
   Security,
+  Verified,
 } from "@mui/icons-material";
 import { DifferenceUtility } from "../pages/DifferenceUtilityPage";
 import { JSONFormatter } from "../pages/JSONFormatterPage";
 import { JSONPathUtility } from "../pages/JSONPathUtilityPage";
 import { JSONSchemaValidator } from "../pages/JSONSchemaPage";
 import { JSONTreeViewer } from "../pages/JSONTreeViewerPage";
+import JWTNodes from "../pages/JWTNodes";
 import { JWTUtility } from "../pages/JWTUtilityPage";
 import { Utility } from "../types/UtilityInterace";
 
@@ -19,14 +21,14 @@ export const mainUtilities: { [key: string]: Utility } = {
     component: <JSONFormatter />,
     navIcon: <DataObject />,
     isOpen: true,
-    tooltip: "Formatting Utilities",
+    tooltip: "JSON Formatting Tools",
     toolName: "JSON Formatter",
   },
   TREEVIEW: {
     component: <JSONTreeViewer />,
     navIcon: <AccountTree />,
     isOpen: false,
-    tooltip: "JSON Tree",
+    tooltip: "JSON Tree View / Edit",
     toolName: "JSON Tree",
   },
   JPATH: {
@@ -50,8 +52,15 @@ export const extraUtilities: { [key: string]: Utility } = {
     component: <DifferenceUtility />,
     navIcon: <Difference />,
     isOpen: false,
-    tooltip: "Data Difference Utility",
+    tooltip: "Difference Checker",
     toolName: "Difference Checker",
+  },
+  JWTNODEEDITOR: {
+    component: <JWTNodes />,
+    navIcon: <Verified />,
+    isOpen: false,
+    tooltip: "JWT Sign / Verify",
+    toolName: "JWT Sign / Verify",
   },
   JWTDECODE: {
     component: <JWTUtility />,

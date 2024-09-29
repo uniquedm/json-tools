@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import { JsonEditor } from "json-edit-react";
 import React from "react";
+import { useSessionStorage } from "react-use";
 import ExtraOptions from "../components/menus/ExtraOptions";
 import { defaultEditorJSON } from "../data/Defaults";
 import {
@@ -78,6 +79,17 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
 
   const [collapseLevel, setCollapseLevel] = React.useState<number>(1);
   const [showCount, toggleShowCount] = React.useState<boolean>(false);
+
+  const [editorContent, _setEditorContent] = useSessionStorage(
+    "editorContent",
+    JSON.stringify(editorData, null, 2)
+  );
+
+  try {
+    editorData = JSON.parse(editorContent);
+  } catch (err) {
+    console.warn("Invalid Editor Content, switching to default.");
+  }
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>

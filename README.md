@@ -2,7 +2,7 @@
 
 A simple web application that provides various JSON tools to help you work with JSON data more effectively. The app includes features like JSON Formatting, JSON Path Evaluation, a JSON Viewer, and a Difference Editor for comparing JSON data.
 
-## Demo
+## Online Demo
 
 [Live Demo](https://uniquedm.github.io/json-tools/)
 
@@ -17,7 +17,9 @@ A simple web application that provides various JSON tools to help you work with 
 
 - **Difference Editor**: Compare two sets of JSON data side by side to quickly identify differences.
 
-- **JWT Decode**: Decode your JWT Token into payload and headers.
+- **JWT Sign/Verify** : A ReactFlow-based utility for visualizing the signing and verification of JSON Web Tokens (JWT).
+
+- **JWT Decode**: Simple Utility to decode your JWT Token's payload & header.
 
 ### Built With
 
@@ -28,6 +30,8 @@ A simple web application that provides various JSON tools to help you work with 
   - [@mui/material](https://mui.com/)
   - [@mui/icons-material](https://mui.com/material-ui/material-icons/)
 - **Editor**: [@monaco-editor/react](https://www.npmjs.com/package/@monaco-editor/react)
+- **React Flow**: [@xyflow/react](https://reactflow.dev/)
+- **Jose**: [jose](https://www.npmjs.com/package/jose)
 - **Routing**: [react-router-dom](https://reactrouter.com/)
 - **HTTP Client**: [axios](https://axios-http.com/)
 - **JSON Editor**: [json-edit-react](https://www.npmjs.com/package/json-edit-react)

@@ -1,21 +1,20 @@
 import { Editor, OnMount } from "@monaco-editor/react";
-import { AccountTree, DataObject, Settings } from "@mui/icons-material";
+import { Settings } from "@mui/icons-material";
 import {
   Box,
   ButtonGroup,
   Divider,
-  Fab,
   Grid2,
   IconButton,
   Paper,
   Skeleton,
   Stack,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import * as monacoEditor from "monaco-editor";
 import React, { useState } from "react";
-import { useLocalStorage } from "react-use";
+import { useLocalStorage, useSessionStorage } from "react-use";
+import EditorFAB from "../components/EditorFAB";
 import ExtraOptions from "../components/menus/ExtraOptions";
 import { settingTabs } from "../components/menus/JSONFormatterSettings";
 import SettingsDialog from "../components/menus/SettingsDialog";
@@ -266,20 +265,26 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       ? jsonEditCustomDarkTheme
       : jsonEditCustomTheme;
 
-  const getTreeView = () => {
-    if (!editorRef.current) {
-      console.warn("Editor is not ready.");
-      return;
-    }
+  const [editorContent, setEditorContent] = useSessionStorage(
+    "editorContent",
+    JSON.stringify(editorData, null, 2)
+  );
 
-    const rawJson = editorRef.current.getValue();
-    if (!rawJson.trim()) {
-      console.warn("Editor content is empty.");
+  const getTreeView = () => {
+    if (!editorContent || !editorContent.trim()) {
+      if (setSnackbarConfig)
+        setSnackbarConfig({
+          open: true,
+          severity: "warning",
+          message: "Empty Content",
+          duration: 4000,
+        });
+      toggleTreeView();
       return;
     }
 
     try {
-      const parsedJson = JSON.parse(rawJson);
+      const parsedJson = JSON.parse(editorContent);
       return jsonTreeEditor(true, 99, [], jsonEditorTheme, parsedJson);
     } catch (error) {
       if (setSnackbarConfig) {
@@ -292,6 +297,10 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         });
       }
     }
+  };
+
+  const handleEditorChange = (value: string | undefined) => {
+    setEditorContent(value ?? "");
   };
 
   return (
@@ -349,58 +358,20 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
             {!isTreeView && (
               <Editor
                 theme={monacoTheme}
+                value={editorContent}
+                onChange={handleEditorChange}
                 height={"70vh"}
                 defaultLanguage="json"
                 options={{ minimap: { enabled: editorMinimap } }}
                 loading={<Skeleton variant="rounded" animation="wave" />}
-                defaultValue={JSON.stringify(editorData, null, 2)}
                 onMount={handleEditorDidMount}
               />
             )}
             {isTreeView && getTreeView()}
-            {/* Add Tooltip and Fab */}
-            <Tooltip title={isTreeView ? "JSON Editor" : "Tree Viewer"}>
-              <Fab
-                color="primary"
-                size="small"
-                variant="extended"
-                onClick={toggleTreeView}
-                sx={{
-                  position: "absolute",
-                  top: 16,
-                  right: 16,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)", // Set semi-transparent background
-                  backdropFilter: "blur(1px)", // Optional: Add blur effect to background
-                  color: "white", // Ensure text/icon color contrasts well
-                  "&:hover": {
-                    backgroundColor: "rgba(255, 255, 255, 0.3)", // Slightly less transparent on hover
-                  },
-                }}
-              >
-                {isTreeView ? (
-                  <DataObject
-                    sx={{
-                      color: theme.palette.text.primary,
-                    }}
-                  />
-                ) : (
-                  <AccountTree
-                    sx={{
-                      color: theme.palette.text.primary,
-                    }}
-                  />
-                )}
-                <Typography
-                  sx={{
-                    ml: "0.5rem",
-                    color: theme.palette.text.primary,
-                  }}
-                  variant="overline"
-                >
-                  {isTreeView ? "Editor" : "View"}
-                </Typography>
-              </Fab>
-            </Tooltip>
+            <EditorFAB
+              isTreeView={isTreeView}
+              toggleTreeView={toggleTreeView}
+            />
           </Box>
         </Grid2>
       </Grid2>

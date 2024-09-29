@@ -16,7 +16,6 @@ export default function DarkModeSwitch({ setTheme }: ThemeInput) {
               checked ? setTheme(darkTheme) : setTheme(lightTheme);
             }}
             sx={{ m: 1 }}
-            defaultChecked
           />
         }
         label=""

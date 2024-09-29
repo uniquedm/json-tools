@@ -1,6 +1,7 @@
 import { Editor } from "@monaco-editor/react";
 import { FactCheck } from "@mui/icons-material";
 import {
+  alpha,
   Box,
   Button,
   FormControlLabel,
@@ -14,6 +15,7 @@ import {
 import Ajv from "ajv";
 import * as monacoEditor from "monaco-editor";
 import React, { useRef, useState } from "react";
+import { useSessionStorage } from "react-use";
 import ExtraOptions from "../components/menus/ExtraOptions";
 import { darkTheme } from "../data/Themes";
 import { UtilityProps } from "../types/DrawerTypes";
@@ -161,6 +163,24 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
     }
   };
 
+  const [schemaData, setSchemaData] = useSessionStorage(
+    "ajv-schema",
+    JSON.stringify(initialSchema, null, 2)
+  );
+
+  const handleSchemaChange = (value: string | undefined) => {
+    setSchemaData(value ?? "");
+  };
+
+  const [jsonData, setJsonData] = useSessionStorage(
+    "ajv-data",
+    JSON.stringify(initialData, null, 2)
+  );
+
+  const handleDataChange = (value: string | undefined) => {
+    setJsonData(value ?? "");
+  };
+
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
       {/* Container for buttons and options */}
@@ -208,7 +228,8 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
               defaultLanguage="json"
               height={"70vh"}
               loading={<Skeleton variant="rounded" animation="wave" />}
-              defaultValue={JSON.stringify(initialSchema, null, 2)}
+              value={schemaData}
+              onChange={handleSchemaChange}
               options={{
                 minimap: { enabled: false },
               }}
@@ -226,7 +247,8 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
               defaultLanguage="json"
               height={"70vh"}
               loading={<Skeleton variant="rounded" animation="wave" />}
-              defaultValue={JSON.stringify(initialData, null, 2)}
+              value={jsonData}
+              onChange={handleDataChange}
               options={{
                 minimap: { enabled: false },
               }}
@@ -239,10 +261,12 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
         <Grid2 size={4}>
           <Box sx={{ position: "relative" }}>
             {generateWaterMark(RESULT)}
-            <div
+            <Box
               style={{
-                border: `4px solid ${
-                  isValid ? "rgba(0, 255, 0, 0.2)" : "rgba(255, 0, 0, 0.2)"
+                boxShadow: `0 0 25px ${
+                  isValid
+                    ? alpha(theme.palette.success.main, 1)
+                    : alpha(theme.palette.error.main, 1)
                 }`,
               }}
             >
@@ -259,7 +283,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
                   lineNumbers: "off", // Disable line numbers for the result editor
                 }}
               />
-            </div>
+            </Box>
           </Box>
         </Grid2>
       </Grid2>
