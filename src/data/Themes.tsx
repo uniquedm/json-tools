@@ -56,7 +56,7 @@ export const jsonEditCustomDarkTheme = {
       fontVariant: "small-caps",
       fontWeight: "bold",
     },
-    input: ["#ffffff", { fontSize: "90%" }],
+    input: ["#000000", { fontSize: "90%" }],
     inputHighlight: "#555555",
     error: { fontSize: "0.8em", color: "red", fontWeight: "bold" },
     iconCollection: {
