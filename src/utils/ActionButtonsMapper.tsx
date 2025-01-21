@@ -12,6 +12,12 @@ export const actionIconButtons = (actionList: Action[]) =>
         aria-label={action.actionDesc}
         color={action.actionColor || "inherit"}
         onClick={action.actionHandler}
+        sx={{
+          transition: "transform 0.3s",
+          "&:hover": {
+            transform: "scale(1.4)",
+          },
+        }}
       >
         {action.actionIcon}
       </IconButton>

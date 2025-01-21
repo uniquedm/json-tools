@@ -15,17 +15,21 @@ const MenuButton = React.forwardRef<HTMLDivElement, MenuButtonProps>(
         <Stack direction={"column"}>
           <Tooltip title={action.actionDesc}>
             <Button
-              startIcon={action.actionIcon}
-              aria-label={action.actionDesc}
-              color={action.actionColor || "inherit"}
-              onClick={action.actionHandler}
-              size={size} // size remains optional and can be undefined
               sx={{
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "scale(1.2)",
+                },
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 textTransform: "none",
               }}
+              startIcon={action.actionIcon}
+              aria-label={action.actionDesc}
+              color={action.actionColor || "inherit"}
+              onClick={action.actionHandler}
+              size={size} // size remains optional and can be undefined
             >
               <Typography variant="button" fontSize={10}>
                 {action.actionName}

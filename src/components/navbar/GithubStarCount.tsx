@@ -1,5 +1,5 @@
-import { GitHub } from "@mui/icons-material";
-import { Badge, Box, IconButton, Tooltip } from "@mui/material";
+import { GitHub, Star } from "@mui/icons-material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -27,18 +27,30 @@ export default function GithubStarCount({ owner, repo }: GithubInfo) {
   }, [owner, repo]);
 
   return (
-    <Box sx={{ mt: 0.5 }}>
+    <Box sx={{ display: "flex", alignItems: "center", p: 0.5 }}>
       <Tooltip title="Github Repo">
         <IconButton
           onClick={() =>
             window.open(`https://github.com/${owner}/${repo}`, "_blank")
           }
+          sx={{
+            "&:hover": {
+              transform: "scale(1.1)",
+              transition: "all 0.3s ease-in-out",
+            },
+            color: "text.primary",
+          }}
         >
-          <Badge color="error" badgeContent={starCount}>
-            <GitHub />
-          </Badge>
+          <GitHub />
         </IconButton>
       </Tooltip>
+      <Star sx={{ fontSize: "1rem" }} />
+      <Typography
+        variant="overline"
+        sx={{ display: "flex", alignItems: "center", ml: 0.5, mt: 0.3 }}
+      >
+        {starCount}
+      </Typography>
     </Box>
   );
 }
