@@ -1,6 +1,5 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-// @ts-expect-error: vite-plugin-pwa does not provide types by default
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
