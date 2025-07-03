@@ -1,0 +1,16 @@
+{
+  "name": "JSON Tools",
+  "short_name": "JSONTools",
+  "description": "A set of tools for working with JSON data",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/json-tools/",
+  "icons": [
+    {
+      "src": "logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+} 
