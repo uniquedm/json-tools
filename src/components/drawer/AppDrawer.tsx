@@ -184,13 +184,15 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
           setCurrentUtility
         )}
       </Drawer>
-      {renderUtility(currentUtility, {
-        editorData: editorData,
-        setEditorData: setEditorData,
-        theme: appTheme,
-        snackbarConfig: snackbarConfig,
-        setSnackbarConfig: setSnackbarConfig,
-      })}
+      <Box sx={{ flexGrow: 1, width: '100%', pt: (theme) => theme.spacing(3) }}>
+        {renderUtility(currentUtility, {
+          editorData: editorData,
+          setEditorData: setEditorData,
+          theme: appTheme,
+          snackbarConfig: snackbarConfig,
+          setSnackbarConfig: setSnackbarConfig,
+        })}
+      </Box>
       <SnackbarAlert
         snackbarConfig={snackbarConfig}
         setSnackbarConfig={setSnackbarConfig}
