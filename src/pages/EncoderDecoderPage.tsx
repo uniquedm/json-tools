@@ -58,7 +58,7 @@ export const EncoderDecoderPage = () => {
     const [base64Input, setBase64Input] = useState(defaultBase64);
     const [base64Output, setBase64Output] = useState("");
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 
