@@ -18,6 +18,7 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { JsonEditor } from "json-edit-react";
 import React from "react";
@@ -40,6 +41,7 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
   theme = darkTheme,
 }) => {
+  const muiTheme = useTheme();
   const jsonEditorTheme =
     theme.palette.mode === "dark" ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
   const [options, setOptions] = React.useState(() => ["Add", "Edit", "Delete"]);
@@ -93,28 +95,50 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Grid2 container sx={{ mt: 4 }} spacing={2}>
+      <Grid2 container sx={{ mt: 4 }} spacing={3}>
         <Grid2 size={12}>
           <Stack spacing={2} direction="column">
-            <Paper>
-              <Stack sx={{ m: 1 }} spacing={2} direction="row">
+            <Paper
+              elevation={0}
+              sx={{
+                background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${muiTheme.palette.divider}`,
+                borderRadius: 3,
+                p: 1
+              }}
+            >
+              <Stack sx={{ m: 1 }} spacing={2} direction="row" alignItems="center">
                 <ExtraOptions />
-                <Divider orientation="vertical" flexItem />
+                <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: 'center' }} />
                 <ToggleButtonGroup
                   value={options}
                   onChange={handleDevices}
                   aria-label="device"
                   size="small"
-                  sx={{ height: 40 }}
+                  sx={{
+                    height: 40,
+                    '& .MuiToggleButton-root': {
+                      border: 'none',
+                      borderRadius: 2,
+                      mx: 0.5,
+                      '&:hover': {
+                        background: muiTheme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                      },
+                      '&.Mui-selected': {
+                        background: muiTheme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
+                      }
+                    }
+                  }}
                 >
                   {toggleList}
                 </ToggleButtonGroup>
-                <Divider orientation="vertical" flexItem />
-                <Stack spacing={-2}>
-                  <Typography variant="overline">Collapse Level</Typography>
+                <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: 'center' }} />
+                <Stack spacing={0} direction="row" alignItems="center" sx={{ gap: 2, width: 200 }}>
+                  <Typography variant="caption" sx={{ whiteSpace: 'nowrap', color: 'text.secondary' }}>Collapse Level</Typography>
                   <Slider
                     size="small"
-                    sx={{ color: "inherit" }}
+                    sx={{ color: "primary.main" }}
                     aria-labelledby="collapse-level-slider-label"
                     aria-label="Collapse Level"
                     defaultValue={collapseLevel}
@@ -130,13 +154,23 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
                     max={10}
                   />
                 </Stack>
-                <Divider orientation="vertical" flexItem />
+                <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: 'center' }} />
                 <Tooltip title="Show Item Count?">
                   <ToggleButton
                     value="check"
                     selected={showCount}
                     onChange={() => {
                       toggleShowCount(!showCount);
+                    }}
+                    sx={{
+                      border: 'none',
+                      borderRadius: 2,
+                      '&:hover': {
+                        background: muiTheme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                      },
+                      '&.Mui-selected': {
+                        background: muiTheme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
+                      }
                     }}
                   >
                     <FormatListNumberedRtl />
@@ -147,13 +181,24 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
           </Stack>
         </Grid2>
         <Grid2 size={12}>
-          {jsonTreeEditor(
-            showCount,
-            collapseLevel,
-            options,
-            jsonEditorTheme,
-            editorData
-          )}
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${muiTheme.palette.divider}`,
+            }}
+          >
+            {jsonTreeEditor(
+              showCount,
+              collapseLevel,
+              options,
+              jsonEditorTheme,
+              editorData
+            )}
+          </Paper>
         </Grid2>
       </Grid2>
     </Box>

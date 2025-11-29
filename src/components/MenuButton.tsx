@@ -1,4 +1,4 @@
-import { Button, Stack, Tooltip, Typography } from "@mui/material";
+import { Button, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { Action } from "../types/ActionInterface";
 
@@ -12,32 +12,33 @@ const MenuButton = React.forwardRef<HTMLDivElement, MenuButtonProps>(
     // No default value
     return (
       <div ref={ref}>
-        <Stack direction={"column"}>
-          <Tooltip title={action.actionDesc}>
-            <Button
-              sx={{
-                transition: "transform 0.3s",
-                "&:hover": {
-                  transform: "scale(1.2)",
-                },
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textTransform: "none",
-              }}
-              startIcon={action.actionIcon}
-              aria-label={action.actionDesc}
-              color={action.actionColor || "inherit"}
-              onClick={action.actionHandler}
-              size={size} // size remains optional and can be undefined
-            >
-              <Typography variant="button" fontSize={10}>
-                {action.actionName}
-              </Typography>
-            </Button>
-          </Tooltip>
-        </Stack>
-      </div>
+        <Tooltip title={action.actionDesc}>
+          <Button
+            sx={{
+              transition: "all 0.2s",
+              "&:hover": {
+                transform: "translateY(-2px)",
+              },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textTransform: "none",
+              gap: 0.5,
+              minWidth: 64,
+              py: 1
+            }}
+            aria-label={action.actionDesc}
+            color={action.actionColor || "inherit"}
+            onClick={action.actionHandler}
+            size={size}
+          >
+            {action.actionIcon}
+            <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.7rem' }}>
+              {action.actionName}
+            </Typography>
+          </Button>
+        </Tooltip>
+      </div >
     );
   }
 );

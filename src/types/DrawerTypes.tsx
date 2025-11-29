@@ -8,6 +8,7 @@ export interface UtilityDetails<Props = any> {
   isOpen: boolean; // Whether the utility is open
   tooltip: string; // Tooltip text for the utility
   toolName: string; // Display name of the tool
+  category: string; // Category of the tool
   props?: Props; // Optional props to pass to the component
 }
 

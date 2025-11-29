@@ -25,6 +25,7 @@ export const mainUtilities: { [key: string]: Utility } = {
     isOpen: true,
     tooltip: "Home",
     toolName: "Home",
+    category: "General",
   },
   FORMAT: {
     component: <JSONFormatter />,
@@ -32,6 +33,7 @@ export const mainUtilities: { [key: string]: Utility } = {
     isOpen: true,
     tooltip: "JSON Editor & Formatter",
     toolName: "JSON Editor",
+    category: "JSON Tools",
   },
   TREEVIEW: {
     component: <JSONTreeViewer />,
@@ -39,6 +41,7 @@ export const mainUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "JSON Tree View / Edit",
     toolName: "JSON Tree",
+    category: "JSON Tools",
   },
   JPATH: {
     component: <JSONPathUtility />,
@@ -46,6 +49,7 @@ export const mainUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "JSON Path Evaluation",
     toolName: "JSON Path Evaluator",
+    category: "JSON Tools",
   },
   AJV: {
     component: <JSONSchemaValidator />,
@@ -53,6 +57,7 @@ export const mainUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "JSON Schema Validator",
     toolName: "JSON Schema Validator",
+    category: "JSON Tools",
   },
 };
 
@@ -63,6 +68,7 @@ export const extraUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "Difference Checker",
     toolName: "Difference Checker",
+    category: "Utilities",
   },
   JWTNODEEDITOR: {
     component: <JWTNodes />,
@@ -70,6 +76,7 @@ export const extraUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "JWT Sign / Verify",
     toolName: "JWT Sign / Verify",
+    category: "JWT Tools",
   },
   JWTDECODE: {
     component: <JWTUtility />,
@@ -77,5 +84,6 @@ export const extraUtilities: { [key: string]: Utility } = {
     isOpen: false,
     tooltip: "JWT Decoder",
     toolName: "JWT Decoder",
+    category: "JWT Tools",
   },
 };

@@ -11,6 +11,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { useState } from "react";
@@ -23,6 +24,7 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
   const [decodedPayload, setDecodedPayload] = useState<any | null>(null);
   const [decodedHeader, setDecodedHeader] = useState<any | null>(null);
   const [decodeHeader, setDecodeHeader] = useState(false);
+  const theme = useTheme();
 
   const handleDecode = () => {
     try {
@@ -75,18 +77,37 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
     );
   };
 
+  const glassStyle = {
+    background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'blur(20px)',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 4,
+    boxShadow: theme.palette.mode === 'dark' ? '0 8px 32px 0 rgba(0, 0, 0, 0.37)' : '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+    p: 3,
+  };
+
+  const inputStyle = {
+    "& .MuiOutlinedInput-root": {
+      fontFamily: "monospace",
+      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.5)',
+      "& fieldset": {
+        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      },
+      "&:hover fieldset": {
+        borderColor: theme.palette.primary.main,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.primary.main,
+      },
+    },
+  };
+
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Paper
-        elevation={4}
-        sx={{
-          p: 2,
-          m: 4,
-        }}
-      >
-        <Grid2 container sx={{ mt: 2 }} spacing={4}>
-          <Grid2 size={12}>
-            <Stack spacing={2}>
+    <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: '1600px', mx: 'auto' }}>
+      <Grid2 container spacing={3}>
+        <Grid2 size={12}>
+          <Paper elevation={0} sx={glassStyle}>
+            <Stack spacing={3}>
               <TextField
                 minRows={3}
                 label="JWT Token"
@@ -95,99 +116,119 @@ export const JWTUtility: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
                 value={token}
                 multiline
                 onChange={(e) => setToken(e.target.value)}
+                sx={inputStyle}
               />
-              <Stack direction={"row"}>
+              <Stack direction="row" alignItems="center" spacing={2} justifyContent="space-between">
                 <Button
                   startIcon={<Token />}
-                  variant="outlined"
+                  variant="contained"
                   onClick={handleDecode}
+                  sx={{
+                    px: 4,
+                    py: 1,
+                    borderRadius: 2,
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    boxShadow: `0 4px 14px 0 ${theme.palette.primary.main}40`,
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      boxShadow: `0 6px 20px 0 ${theme.palette.primary.main}60`,
+                    }
+                  }}
                 >
                   Decode Token
                 </Button>
-                <Box sx={{ ml: "auto" }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={decodeHeader}
-                        onChange={(e) => {
-                          setDecodeHeader(e.target.checked);
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography variant="overline">
-                        Decode JWT Header
-                      </Typography>
-                    }
-                  />
-                </Box>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={decodeHeader}
+                      onChange={(e) => setDecodeHeader(e.target.checked)}
+                      sx={{
+                        color: theme.palette.primary.main,
+                        '&.Mui-checked': {
+                          color: theme.palette.primary.main,
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography variant="button" color="text.secondary">
+                      Decode Header
+                    </Typography>
+                  }
+                />
               </Stack>
             </Stack>
-          </Grid2>
-          <Grid2 size={6}>
-            {decodedPayload && (
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  id="outlined-textarea"
-                  label={
-                    <Typography variant="button">Decoded Payload</Typography>
-                  }
-                  multiline
-                  minRows={10}
-                  value={JSON.stringify(decodedPayload, null, 2)}
-                  sx={{ width: "80%" }}
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                    },
-                  }}
-                />
-                <Tooltip title="Copy Content">
-                  <IconButton
-                    onClick={() =>
-                      handleCopy(JSON.stringify(decodedPayload, null, 2))
-                    }
-                    sx={{ position: "absolute" }}
-                  >
-                    <ContentCopy />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )}
-          </Grid2>
-          <Grid2 size={6}>
-            {decodedHeader && (
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  id="outlined-textarea"
-                  label={
-                    <Typography variant="button">Decoded Header</Typography>
-                  }
-                  multiline
-                  minRows={10}
-                  value={JSON.stringify(decodedHeader, null, 2)}
-                  sx={{ width: "80%" }}
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                    },
-                  }}
-                />
-                <Tooltip title="Copy Content">
-                  <IconButton
-                    onClick={() =>
-                      handleCopy(JSON.stringify(decodedHeader, null, 2))
-                    }
-                    sx={{ position: "absolute" }}
-                  >
-                    <ContentCopy />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )}
-          </Grid2>
+          </Paper>
         </Grid2>
-      </Paper>
+
+        {(decodedPayload || decodedHeader) && (
+          <>
+            {decodedHeader && (
+              <Grid2 size={{ xs: 12, md: 6 }}>
+                <Paper elevation={0} sx={{ ...glassStyle, height: '100%' }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                    <Typography variant="h6" fontWeight="bold" color="text.secondary">
+                      Header
+                    </Typography>
+                    <Tooltip title="Copy Header">
+                      <IconButton
+                        onClick={() => handleCopy(JSON.stringify(decodedHeader, null, 2))}
+                        size="small"
+                        sx={{ color: 'primary.main' }}
+                      >
+                        <ContentCopy fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Stack>
+                  <TextField
+                    multiline
+                    minRows={10}
+                    fullWidth
+                    value={JSON.stringify(decodedHeader, null, 2)}
+                    sx={inputStyle}
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                      },
+                    }}
+                  />
+                </Paper>
+              </Grid2>
+            )}
+
+            <Grid2 size={{ xs: 12, md: decodedHeader ? 6 : 12 }}>
+              <Paper elevation={0} sx={{ ...glassStyle, height: '100%' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                  <Typography variant="h6" fontWeight="bold" color="text.secondary">
+                    Payload
+                  </Typography>
+                  <Tooltip title="Copy Payload">
+                    <IconButton
+                      onClick={() => handleCopy(JSON.stringify(decodedPayload, null, 2))}
+                      size="small"
+                      sx={{ color: 'primary.main' }}
+                    >
+                      <ContentCopy fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+                <TextField
+                  multiline
+                  minRows={10}
+                  fullWidth
+                  value={JSON.stringify(decodedPayload, null, 2)}
+                  sx={inputStyle}
+                  slotProps={{
+                    input: {
+                      readOnly: true,
+                    },
+                  }}
+                />
+              </Paper>
+            </Grid2>
+          </>
+        )}
+      </Grid2>
     </Box>
   );
 };

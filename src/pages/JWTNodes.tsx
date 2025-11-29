@@ -157,6 +157,53 @@ const JWTNodes: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
 
   const secretRequired = verify
     ? [
+      {
+        id: "secret-token",
+        source: "secret",
+        target: "token",
+        animated: true,
+        ...defaultEdge,
+        targetHandle: "secret",
+      },
+    ]
+    : [];
+
+  const headerRequired = headerDecode
+    ? [
+      {
+        id: "token-header",
+        source: "token",
+        target: "header",
+        label: "base64UrlDecode",
+        animated: true,
+        ...defaultEdge,
+        sourceHandle: "header",
+      },
+    ]
+    : [];
+
+  // Conditional edges depending on the mode (encode or decode)
+  const initialEdges: Edge[] =
+    mode === "encode"
+      ? [
+        {
+          id: "header-token",
+          source: "header",
+          target: "token",
+          animated: true,
+          label: "base64UrlEncode",
+          ...defaultEdge,
+          targetHandle: "header",
+        },
+        {
+          id: "payload-token",
+          source: "payload",
+          target: "token",
+          label: "base64UrlEncode",
+          animated: true,
+          ...defaultEdge,
+          targetHandle: "payload",
+        },
         {
           id: "secret-token",
           source: "secret",
@@ -166,66 +213,19 @@ const JWTNodes: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
           targetHandle: "secret",
         },
       ]
-    : [];
-
-  const headerRequired = headerDecode
-    ? [
+      : [
+        ...headerRequired,
         {
-          id: "token-header",
+          id: "token-payload",
           source: "token",
-          target: "header",
+          target: "payload",
           label: "base64UrlDecode",
           animated: true,
           ...defaultEdge,
-          sourceHandle: "header",
+          sourceHandle: "payload",
         },
-      ]
-    : [];
-
-  // Conditional edges depending on the mode (encode or decode)
-  const initialEdges: Edge[] =
-    mode === "encode"
-      ? [
-          {
-            id: "header-token",
-            source: "header",
-            target: "token",
-            animated: true,
-            label: "base64UrlEncode",
-            ...defaultEdge,
-            targetHandle: "header",
-          },
-          {
-            id: "payload-token",
-            source: "payload",
-            target: "token",
-            label: "base64UrlEncode",
-            animated: true,
-            ...defaultEdge,
-            targetHandle: "payload",
-          },
-          {
-            id: "secret-token",
-            source: "secret",
-            target: "token",
-            animated: true,
-            ...defaultEdge,
-            targetHandle: "secret",
-          },
-        ]
-      : [
-          ...headerRequired,
-          {
-            id: "token-payload",
-            source: "token",
-            target: "payload",
-            label: "base64UrlDecode",
-            animated: true,
-            ...defaultEdge,
-            sourceHandle: "payload",
-          },
-          ...secretRequired,
-        ];
+        ...secretRequired,
+      ];
   return (
     <Box sx={{ mt: 6 }} style={{ height: "85vh", width: "100%" }}>
       <ReactFlow
@@ -244,20 +244,31 @@ const JWTNodes: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
         fitView
       >
         <Panel position={"top-right"}>
-          <Paper elevation={4} sx={{ borderRadius: 1, p: 2 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              p: 2,
+              background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${theme.palette.divider}`,
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "space-between",
+                mb: 2,
               }}
             >
-              <Typography variant="button">Encode</Typography>
+              <Typography variant="button" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Encode</Typography>
               <Switch
                 checked={mode === "decode"}
                 onChange={handleToggle}
                 inputProps={{ "aria-label": "Encode/Decode Toggle" }}
               />
-              <Typography variant="button">Decode</Typography>
+              <Typography variant="button" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Decode</Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
               {mode === "encode" ? (
@@ -266,22 +277,24 @@ const JWTNodes: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
                   variant="contained"
                   fullWidth
                   onClick={encodeToken}
+                  sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
                 >
                   Encode
                 </Button>
               ) : (
-                <Stack>
+                <Stack spacing={2} width="100%">
                   <Button
                     startIcon={<LockOpen />}
                     variant="contained"
                     fullWidth
                     onClick={decodeToken}
+                    sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
                   >
                     Decode
                   </Button>
-                  <Stack direction={"row"}>
+                  <Stack direction={"row"} justifyContent="space-between">
                     <FormControlLabel
-                      label={<Typography variant="overline">Header</Typography>}
+                      label={<Typography variant="caption" sx={{ fontWeight: 'bold' }}>Header</Typography>}
                       control={
                         <Checkbox
                           size="small"
@@ -292,7 +305,7 @@ const JWTNodes: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
                       }
                     />
                     <FormControlLabel
-                      label={<Typography variant="overline">Verify</Typography>}
+                      label={<Typography variant="caption" sx={{ fontWeight: 'bold' }}>Verify</Typography>}
                       control={
                         <Checkbox
                           size="small"

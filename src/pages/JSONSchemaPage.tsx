@@ -11,6 +11,7 @@ import {
   Stack,
   Switch,
   Typography,
+  useTheme,
 } from "@mui/material";
 import Ajv from "ajv";
 import * as monacoEditor from "monaco-editor";
@@ -50,6 +51,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
   theme = darkTheme,
   setSnackbarConfig,
 }) => {
+  const muiTheme = useTheme();
   const monacoTheme = theme.palette.mode === "dark" ? "vs-dark" : "light";
   const [result, setResult] = useState<string | undefined>();
   const [isValid, setIsValid] = useState<boolean>(true);
@@ -184,17 +186,27 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
       {/* Container for buttons and options */}
-      <Grid2 container sx={{ mt: 4 }} spacing={4}>
+      <Grid2 container sx={{ mt: 4 }} spacing={3}>
         <Grid2 size={12}>
           <Stack spacing={2} direction="column">
-            <Paper>
-              <Stack sx={{ m: 1 }} spacing={2} direction="row">
+            <Paper
+              elevation={0}
+              sx={{
+                p: 1,
+                background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${muiTheme.palette.divider}`,
+                borderRadius: 3,
+              }}
+            >
+              <Stack sx={{ m: 1 }} spacing={2} direction="row" alignItems="center">
                 <ExtraOptions />
                 <Button
                   startIcon={<FactCheck />}
                   color="success"
-                  variant="outlined"
+                  variant="contained"
                   onClick={handleSchemaValidation}
+                  sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
                 >
                   Validate
                 </Button>
@@ -209,7 +221,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
                       }}
                     />
                   }
-                  label={<Typography variant="overline">ALL ERRORS</Typography>}
+                  label={<Typography variant="caption" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>ALL ERRORS</Typography>}
                 />
               </Stack>
             </Paper>
@@ -218,10 +230,20 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
       </Grid2>
 
       {/* Editors and Validation Result */}
-      <Grid2 container sx={{ mt: 2 }}>
+      <Grid2 container sx={{ mt: 3 }} spacing={3}>
         {/* Schema Editor */}
         <Grid2 size={4}>
-          <Box sx={{ position: "relative" }}>
+          <Paper
+            elevation={0}
+            sx={{
+              position: "relative",
+              overflow: 'hidden',
+              borderRadius: 3,
+              background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${muiTheme.palette.divider}`,
+            }}
+          >
             {generateWaterMark(SCHEMA)}
             <Editor
               theme={monacoTheme}
@@ -232,15 +254,26 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
               onChange={handleSchemaChange}
               options={{
                 minimap: { enabled: false },
+                padding: { top: 16, bottom: 16 },
               }}
               onMount={(editor) => handleEditorMount(editor, SCHEMA)}
             />
-          </Box>
+          </Paper>
         </Grid2>
 
         {/* Data Editor */}
         <Grid2 size={4}>
-          <Box sx={{ position: "relative" }}>
+          <Paper
+            elevation={0}
+            sx={{
+              position: "relative",
+              overflow: 'hidden',
+              borderRadius: 3,
+              background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${muiTheme.palette.divider}`,
+            }}
+          >
             {generateWaterMark(DATA)}
             <Editor
               theme={monacoTheme}
@@ -251,22 +284,34 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
               onChange={handleDataChange}
               options={{
                 minimap: { enabled: false },
+                padding: { top: 16, bottom: 16 },
               }}
               onMount={(editor) => handleEditorMount(editor, DATA)}
             />
-          </Box>
+          </Paper>
         </Grid2>
 
         {/* Validation Result Display */}
         <Grid2 size={4}>
-          <Box sx={{ position: "relative" }}>
+          <Paper
+            elevation={0}
+            sx={{
+              position: "relative",
+              overflow: 'hidden',
+              borderRadius: 3,
+              background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${muiTheme.palette.divider}`,
+            }}
+          >
             {generateWaterMark(RESULT)}
             <Box
               style={{
-                boxShadow: `0 0 25px ${isValid
-                    ? alpha(theme.palette.success.main, 1)
-                    : alpha(theme.palette.error.main, 1)
+                boxShadow: `inset 0 0 20px ${isValid
+                  ? alpha(theme.palette.success.main, 0.2)
+                  : alpha(theme.palette.error.main, 0.2)
                   }`,
+                height: '100%',
               }}
             >
               <Editor
@@ -280,10 +325,11 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
                   readOnly: true,
                   minimap: { enabled: false },
                   lineNumbers: "off", // Disable line numbers for the result editor
+                  padding: { top: 16, bottom: 16 },
                 }}
               />
             </Box>
-          </Box>
+          </Paper>
         </Grid2>
       </Grid2>
     </Box>

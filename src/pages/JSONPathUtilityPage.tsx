@@ -22,6 +22,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { JsonData, JsonEditor } from "json-edit-react";
 import { JSONPath } from "jsonpath-plus";
@@ -95,6 +96,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   theme = darkTheme,
   setEditorData,
 }) => {
+  const muiTheme = useTheme();
   const monacoTheme = theme.palette.mode === "dark" ? "vs-dark" : "light";
   const jsonEditorTheme =
     theme.palette.mode === "dark" ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
@@ -270,114 +272,146 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Grid2 container sx={{ mt: 4 }}>
+      <Grid2 container sx={{ mt: 4 }} spacing={3}>
         <Box sx={{ flex: 1 }}>
-          <Stack spacing={2} direction="column">
-            <Stack spacing={2} direction="row">
-              <Paper
-                component="form"
-                sx={{
-                  p: "2px 4px",
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <ExtraOptions
-                  handleFileLoad={handleLoadFile}
-                  handleCopy={handleCopy}
-                  handlePrint={handlePrint}
-                  handleSave={handleSave}
-                />
-                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                <Autocomplete
-                  id="JSON Path Query"
-                  open={open}
-                  onOpen={handleOpen}
-                  onClose={handleClose}
-                  onFocus={handleOpen} // Trigger on focus
-                  onAbort={handleClose}
-                  clearOnEscape={true}
-                  onClick={handleOpen} // Trigger on click
-                  loading={loading}
-                  freeSolo
-                  defaultValue={"$"}
-                  fullWidth
-                  PaperComponent={StyledPaper} // Apply custom Paper component for dropdown
-                  options={queries.map((option) => option.path)}
-                  onChange={handleAutocompleteChange} // Use dedicated handler
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      onChange={handleTextFieldChange} // Use dedicated handler for text input
-                      placeholder="JSON Path Expression..."
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": {
-                            border: "none", // Remove the border
-                          },
+          <Stack spacing={3} direction="column">
+            <Paper
+              component="form"
+              elevation={0}
+              sx={{
+                p: 1,
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${muiTheme.palette.divider}`,
+                borderRadius: 3,
+              }}
+            >
+              <ExtraOptions
+                handleFileLoad={handleLoadFile}
+                handleCopy={handleCopy}
+                handlePrint={handlePrint}
+                handleSave={handleSave}
+              />
+              <Divider sx={{ height: 28, m: 0.5, mx: 1 }} orientation="vertical" />
+              <Autocomplete
+                id="JSON Path Query"
+                open={open}
+                onOpen={handleOpen}
+                onClose={handleClose}
+                onFocus={handleOpen} // Trigger on focus
+                onAbort={handleClose}
+                clearOnEscape={true}
+                onClick={handleOpen} // Trigger on click
+                loading={loading}
+                freeSolo
+                defaultValue={"$"}
+                fullWidth
+                PaperComponent={StyledPaper} // Apply custom Paper component for dropdown
+                options={queries.map((option) => option.path)}
+                onChange={handleAutocompleteChange} // Use dedicated handler
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    onChange={handleTextFieldChange} // Use dedicated handler for text input
+                    placeholder="JSON Path Expression..."
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          border: "none", // Remove the border
                         },
-                      }}
-                      slotProps={{
-                        input: {
-                          ...params.InputProps,
-                          endAdornment: (
-                            <React.Fragment>
-                              {loading ? (
-                                <CircularProgress color="inherit" size={20} />
-                              ) : null}
-                              {params.InputProps.endAdornment}
-                            </React.Fragment>
-                          ),
-                        },
-                      }}
-                    />
-                  )}
-                />
-                <Tooltip title="Copy Expression">
-                  <IconButton onClick={handleCopyExpression}>
-                    <ContentCopy />
-                  </IconButton>
-                </Tooltip>
-                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                <Tooltip title="How to use?">
-                  <IconButton
-                    onClick={() => toggleHelp(true)}
-                    type="button"
-                    sx={{ p: "10px" }}
-                    aria-label="search"
-                  >
-                    <Help color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </Paper>
-            </Stack>
-            <Grid2 container sx={{ alignItems: "stretch" }}>
+                      },
+                    }}
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {loading ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
+              <Tooltip title="Copy Expression">
+                <IconButton onClick={handleCopyExpression} sx={{ color: 'primary.main' }}>
+                  <ContentCopy />
+                </IconButton>
+              </Tooltip>
+              <Divider sx={{ height: 28, m: 0.5, mx: 1 }} orientation="vertical" />
+              <Tooltip title="How to use?">
+                <IconButton
+                  onClick={() => toggleHelp(true)}
+                  type="button"
+                  sx={{ p: "10px", color: 'secondary.main' }}
+                  aria-label="search"
+                >
+                  <Help />
+                </IconButton>
+              </Tooltip>
+            </Paper>
+            <Grid2 container sx={{ alignItems: "stretch" }} spacing={3}>
               <Grid2 size={6}>
-                <Editor
-                  height={"70vh"}
-                  theme={monacoTheme}
-                  defaultLanguage="json"
-                  loading={<Skeleton variant="rounded" animation="wave" />}
-                  defaultValue={JSON.stringify(editorData, null, 2)}
-                  onMount={handleEditorDidMount}
-                />
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 0,
+                    overflow: 'hidden',
+                    borderRadius: 3,
+                    background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${muiTheme.palette.divider}`,
+                  }}
+                >
+                  <Editor
+                    height={"70vh"}
+                    theme={monacoTheme}
+                    defaultLanguage="json"
+                    loading={<Skeleton variant="rounded" animation="wave" />}
+                    defaultValue={JSON.stringify(editorData, null, 2)}
+                    onMount={handleEditorDidMount}
+                    options={{
+                      minimap: { enabled: false },
+                      padding: { top: 16, bottom: 16 },
+                    }}
+                  />
+                </Paper>
               </Grid2>
               <Grid2 size={6}>
-                <JsonEditor
-                  rootName="result"
-                  minWidth={"100%"}
-                  restrictAdd={true}
-                  restrictDelete={true}
-                  restrictEdit={true}
-                  icons={{
-                    copy: <ContentCopy />,
-                    ok: <Done />,
-                    cancel: <Close />,
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    height: '100%',
+                    overflow: 'auto',
+                    borderRadius: 3,
+                    background: muiTheme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${muiTheme.palette.divider}`,
                   }}
-                  theme={jsonEditorTheme}
-                  data={outputJSON}
-                />
+                >
+                  <JsonEditor
+                    rootName="result"
+                    minWidth={"100%"}
+                    restrictAdd={true}
+                    restrictDelete={true}
+                    restrictEdit={true}
+                    icons={{
+                      copy: <ContentCopy />,
+                      ok: <Done />,
+                      cancel: <Close />,
+                    }}
+                    theme={jsonEditorTheme}
+                    data={outputJSON}
+                  />
+                </Paper>
               </Grid2>
             </Grid2>
           </Stack>

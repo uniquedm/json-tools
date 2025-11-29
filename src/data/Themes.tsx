@@ -15,7 +15,16 @@ export const getTheme = (mode: "light" | "dark", accentColor: string): Theme => 
     palette: {
       mode,
       primary: {
-        main: accentColor,
+        main:
+          mode === "dark"
+            ? accentColor === accentColors.DeepPurple
+              ? "#B388FF"
+              : accentColor === accentColors.CrimsonRed
+                ? "#FF5252"
+                : accentColor === accentColors.Graphite
+                  ? "#90A4AE"
+                  : accentColor
+            : accentColor,
       },
       background: {
         default: mode === "dark" ? "#121212" : "#f5f5f5",

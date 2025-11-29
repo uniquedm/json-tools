@@ -4,4 +4,5 @@ export interface Utility {
   isOpen: boolean;
   tooltip: string;
   toolName: string;
+  category: string;
 }

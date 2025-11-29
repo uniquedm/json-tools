@@ -12,6 +12,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
 import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -46,81 +47,135 @@ export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, a
     toggleDrawer(false);
   };
 
-  const drawerListItems = (
-    utilityMap: { [key: string]: UtilityDetails },
-    open: any,
-    currentUtility: any,
-    setCurrentUtility: any
+  const renderDrawerList = (
+    allUtilities: { [key: string]: UtilityDetails },
+    open: boolean,
+    currentUtility: UtilityDetails,
+    setCurrentUtility: (u: UtilityDetails) => void
   ) => {
+    const groupedUtilities = Object.values(allUtilities).reduce((acc, utility) => {
+      const category = utility.category || "Other";
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(utility);
+      return acc;
+    }, {} as { [key: string]: UtilityDetails[] });
+
     return (
       <List>
-        {Object.entries(utilityMap).map(([utilityName, utilityDetails]) => (
-          <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              onClick={() => {
-                // Reset all isOpen flags
-                Object.values(mainUtilities).forEach(u => u.isOpen = false);
-                Object.values(extraUtilities).forEach(u => u.isOpen = false);
+        {Object.entries(groupedUtilities).map(([category, utilities]) => (
+          <React.Fragment key={category}>
+            {open && (
+              <ListSubheader
+                sx={{
+                  backgroundColor: "transparent",
+                  textTransform: "uppercase",
+                  fontWeight: "bold",
+                  fontSize: "0.75rem",
+                  lineHeight: "48px",
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                {category}
+              </ListSubheader>
+            )}
+            {utilities.map((utilityDetails) => (
+              <ListItem key={utilityDetails.toolName} disablePadding sx={{ display: "block" }}>
+                <ListItemButton
+                  onClick={() => {
+                    // Reset all isOpen flags
+                    Object.values(allUtilities).forEach((u) => (u.isOpen = false));
 
-                utilityDetails.isOpen = true;
-                setCurrentUtility(utilityDetails);
-              }}
-              sx={[
-                {
-                  color: currentUtility.toolName === utilityDetails.toolName
-                    ? appTheme?.palette.primary.main
-                    : appTheme?.palette.text.disabled,
-                  minHeight: 48,
-                  px: 2.5,
-                },
-                open
-                  ? {
-                    justifyContent: "initial",
-                  }
-                  : {
-                    justifyContent: "center",
-                  },
-              ]}
-            >
-              <Tooltip title={utilityDetails.tooltip}>
-                <ListItemIcon
+                    utilityDetails.isOpen = true;
+                    setCurrentUtility(utilityDetails);
+                  }}
                   sx={[
                     {
-                      color: currentUtility.toolName === utilityDetails.toolName
-                        ? appTheme?.palette.primary.main
-                        : appTheme?.palette.text.disabled,
-                      minWidth: 0,
-                      justifyContent: "center",
+                      color:
+                        currentUtility.toolName === utilityDetails.toolName
+                          ? appTheme?.palette.primary.main
+                          : appTheme?.palette.text.secondary,
+                      minHeight: 48,
+                      px: 2.5,
+                      mx: 1,
+                      borderRadius: 2,
+                      mb: 0.5,
+                      transition: "all 0.2s ease-in-out",
+                      "&:hover": {
+                        backgroundColor: appTheme?.palette.mode === 'dark'
+                          ? `${appTheme?.palette.primary.main}15`
+                          : `${appTheme?.palette.primary.main}10`,
+                        transform: "translateX(4px)",
+                        boxShadow: appTheme?.palette.mode === 'dark'
+                          ? `0 4px 12px -4px ${appTheme?.palette.primary.main}40`
+                          : `0 4px 12px -4px ${appTheme?.palette.primary.main}20`,
+                      },
+                      ...(currentUtility.toolName === utilityDetails.toolName && {
+                        backgroundColor: appTheme?.palette.mode === 'dark'
+                          ? `${appTheme?.palette.primary.main}20`
+                          : `${appTheme?.palette.primary.main}15`,
+                        fontWeight: "bold",
+                      })
                     },
                     open
                       ? {
-                        mr: 3,
+                        justifyContent: "initial",
                       }
                       : {
-                        mr: "auto",
+                        justifyContent: "center",
+                        px: 1, // Reduce padding when closed
                       },
                   ]}
                 >
-                  {utilityDetails.navIcon}
-                </ListItemIcon>
-              </Tooltip>
-              <ListItemText
-                primary={utilityDetails.toolName}
-                sx={[
-                  open
-                    ? {
-                      opacity: 1,
-                    }
-                    : {
-                      opacity: 0,
-                    },
-                ]}
-                primaryTypographyProps={{
-                  variant: "button", // Apply your desired typography variant
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
+                  <Tooltip title={utilityDetails.tooltip} placement="right">
+                    <ListItemIcon
+                      sx={[
+                        {
+                          color:
+                            currentUtility.toolName === utilityDetails.toolName
+                              ? appTheme?.palette.primary.main
+                              : "inherit",
+                          minWidth: 0,
+                          justifyContent: "center",
+                          transition: "color 0.2s",
+                        },
+                        open
+                          ? {
+                            mr: 3,
+                          }
+                          : {
+                            mr: 0,
+                          },
+                      ]}
+                    >
+                      {utilityDetails.navIcon}
+                    </ListItemIcon>
+                  </Tooltip>
+                  <ListItemText
+                    primary={utilityDetails.toolName}
+                    sx={[
+                      open
+                        ? {
+                          opacity: 1,
+                        }
+                        : {
+                          opacity: 0,
+                          display: "none",
+                        },
+                    ]}
+                    primaryTypographyProps={{
+                      variant: "button",
+                      fontWeight: currentUtility.toolName === utilityDetails.toolName ? 700 : 500,
+                      fontSize: "0.875rem",
+                      textTransform: "none", // More modern look
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+            <Divider sx={{ my: 1 }} />
+          </React.Fragment>
         ))}
       </List>
     );
@@ -186,21 +241,15 @@ export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, a
           </IconButton>
         </DrawerHeader>
         <Divider />
-        {drawerListItems(
-          mainUtilities,
-          isDrawerOpen,
-          currentUtility,
-          setCurrentUtility
-        )}
-        <Divider />
-        {drawerListItems(
-          extraUtilities,
+        {renderDrawerList(
+          { ...mainUtilities, ...extraUtilities },
           isDrawerOpen,
           currentUtility,
           setCurrentUtility
         )}
       </Drawer>
-      <Box sx={{ flexGrow: 1, width: '100%', pt: (theme) => theme.spacing(3) }}>
+      <Box sx={{ flexGrow: 1, width: '100%' }}>
+        <DrawerHeader />
         {renderUtility(currentUtility, {
           editorData: editorData,
           setEditorData: setEditorData,
@@ -292,9 +341,10 @@ const Drawer = styled(MuiDrawer, {
         ...openedMixin(theme),
         "& .MuiDrawer-paper": {
           ...openedMixin(theme),
-          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(12px)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(20px)',
+          borderRight: `1px solid ${theme.palette.divider}`,
+          boxShadow: theme.palette.mode === 'dark' ? '5px 0 30px rgba(0,0,0,0.5)' : '5px 0 30px rgba(0,0,0,0.05)',
         },
       },
     },
@@ -304,9 +354,9 @@ const Drawer = styled(MuiDrawer, {
         ...closedMixin(theme),
         "& .MuiDrawer-paper": {
           ...closedMixin(theme),
-          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(12px)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(20px)',
+          borderRight: `1px solid ${theme.palette.divider}`,
         },
       },
     },

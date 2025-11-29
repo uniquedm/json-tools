@@ -520,30 +520,52 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         </MenuItem>
       </Menu>
 
-      <Grid2 container sx={{ mt: 4 }} spacing={2}>
+      <Grid2 container sx={{ mt: 4 }} spacing={3}>
         <Grid2 size={12}>
-          <Paper elevation={0} sx={{ bgcolor: 'transparent' }}>
-            <Stack sx={{ m: 0, p: 0.5 }} spacing={1} direction="row">
+          <Paper
+            elevation={0}
+            sx={{
+              background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: 3,
+              p: 1
+            }}
+          >
+            <Stack sx={{ m: 0, p: 0.5 }} spacing={1} direction="row" alignItems="center">
               <ExtraOptions
                 handleFileLoad={handleLoadFile}
                 handleCopy={handleCopy}
                 handlePrint={handlePrint}
                 handleSave={handleSave}
               />
-              <Divider orientation="vertical" flexItem />
+              <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: 'center' }} />
               <Tooltip title="Settings">
                 <IconButton
-                  sx={{ height: "40px", width: "40px" }}
+                  sx={{
+                    height: "36px",
+                    width: "36px",
+                    borderRadius: 2,
+                    '&:hover': {
+                      background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                    }
+                  }}
                   onClick={handleSettingsOpen}
                 >
-                  <Settings />
+                  <Settings fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Divider orientation="vertical" flexItem />
+              <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: 'center' }} />
               <ButtonGroup
                 sx={{
                   "& .MuiButton-root": {
                     border: "none",
+                    borderRadius: 2,
+                    mx: 0.5,
+                    padding: '6px 12px',
+                    '&:hover': {
+                      background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                    }
                   },
                   "& .MuiButtonGroup-grouped:not(:last-of-type)": {
                     borderRight: "none",
@@ -562,9 +584,20 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         </Grid2>
 
         {/* Main Content Area with Vertical Tabs */}
-        <Grid2 size={12} sx={{ display: 'flex', flexDirection: 'row', height: '70vh', gap: 2 }}>
+        <Grid2 size={12} sx={{ display: 'flex', flexDirection: 'row', height: '70vh', gap: 3 }}>
           {/* Editor Area */}
-          <Paper elevation={3} sx={{ flexGrow: 1, position: "relative", overflow: 'hidden', borderRadius: 2 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              flexGrow: 1,
+              position: "relative",
+              overflow: 'hidden',
+              borderRadius: 3,
+              background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${theme.palette.divider}`,
+            }}
+          >
             {!isTreeView && (
               <Editor
                 theme={monacoTheme}
@@ -572,7 +605,13 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                 onChange={handleEditorChange}
                 height={"100%"}
                 defaultLanguage="json"
-                options={{ minimap: { enabled: editorMinimap }, padding: { top: 16 } }}
+                options={{
+                  minimap: { enabled: editorMinimap },
+                  padding: { top: 24, bottom: 24 },
+                  fontFamily: 'monospace',
+                  fontSize: 14,
+                  lineHeight: 24,
+                }}
                 loading={<Skeleton variant="rounded" animation="wave" />}
                 onMount={handleEditorDidMount}
               />
@@ -585,14 +624,40 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
           </Paper>
 
           {/* Vertical Tabs Area */}
-          <Paper elevation={3} sx={{ width: 280, display: 'flex', flexDirection: 'column', borderRadius: 2, overflow: 'hidden' }}>
-            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }}>
+          <Paper
+            elevation={0}
+            sx={{
+              width: 280,
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: 3,
+              overflow: 'hidden',
+              background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              border: `1px solid ${theme.palette.divider}`,
+            }}
+          >
+            <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
                   Open Files
                 </Typography>
                 <Tooltip title="New File">
-                  <IconButton onClick={handleAddTab} size="small" sx={{ bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}>
+                  <IconButton
+                    onClick={handleAddTab}
+                    size="small"
+                    sx={{
+                      bgcolor: 'primary.main',
+                      color: 'white',
+                      width: 32,
+                      height: 32,
+                      '&:hover': {
+                        bgcolor: 'primary.dark',
+                        transform: 'scale(1.05)',
+                        transition: 'transform 0.2s'
+                      }
+                    }}
+                  >
                     <Add fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -607,8 +672,9 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                 flexGrow: 1,
                 '& .MuiTabs-indicator': {
                   left: 0,
-                  width: 4,
-                  borderRadius: '0 4px 4px 0'
+                  width: 3,
+                  borderRadius: '0 4px 4px 0',
+                  backgroundColor: 'primary.main'
                 }
               }}
             >
@@ -617,8 +683,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                   key={tab.id}
                   value={tab.id}
                   label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', py: 1 }}>
-                      <Typography variant="body2" noWrap sx={{ maxWidth: 180, fontWeight: activeTabId === tab.id ? 600 : 400 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', py: 0.5 }}>
+                      <Typography variant="body2" noWrap sx={{ maxWidth: 160, fontWeight: activeTabId === tab.id ? 600 : 400, fontSize: '0.9rem' }}>
                         {tab.name}
                       </Typography>
                       {tabs.length > 1 && (
@@ -627,13 +693,13 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                           onClick={(e) => handleCloseTab(e, tab.id)}
                           sx={{
                             opacity: 0,
-                            transition: 'opacity 0.2s',
+                            transition: 'all 0.2s',
                             padding: 0.5,
-                            '&:hover': { bgcolor: 'error.light', color: 'error.contrastText' }
+                            '&:hover': { bgcolor: 'error.soft', color: 'error.main' }
                           }}
                           className="close-btn"
                         >
-                          <Close fontSize="small" sx={{ fontSize: '1rem' }} />
+                          <Close fontSize="small" sx={{ fontSize: '0.9rem' }} />
                         </IconButton>
                       )}
                     </Box>
@@ -642,16 +708,20 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                   sx={{
                     alignItems: 'flex-start',
                     textAlign: 'left',
-                    minHeight: 56,
-                    borderBottom: 1,
-                    borderColor: 'divider',
+                    minHeight: 48,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
                     textTransform: 'none',
+                    mx: 1,
+                    mt: 1,
+                    borderRadius: 2,
+                    transition: 'all 0.2s ease',
                     '&:hover': {
                       bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
                       '& .close-btn': { opacity: 0.7 }
                     },
                     '&.Mui-selected': {
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                      color: 'primary.main',
                       '& .close-btn': { opacity: 1 }
                     }
                   }}
