@@ -106,17 +106,13 @@ export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, a
                         backgroundColor: appTheme?.palette.mode === 'dark'
                           ? `${appTheme?.palette.primary.main}15`
                           : `${appTheme?.palette.primary.main}10`,
-                        transform: "translateX(4px)",
-                        boxShadow: appTheme?.palette.mode === 'dark'
-                          ? `0 4px 12px -4px ${appTheme?.palette.primary.main}40`
-                          : `0 4px 12px -4px ${appTheme?.palette.primary.main}20`,
                       },
-                      ...(currentUtility.toolName === utilityDetails.toolName && {
-                        backgroundColor: appTheme?.palette.mode === 'dark'
-                          ? `${appTheme?.palette.primary.main}20`
-                          : `${appTheme?.palette.primary.main}15`,
-                        fontWeight: "bold",
-                      })
+                    },
+                    currentUtility.toolName === utilityDetails.toolName && {
+                      backgroundColor: appTheme?.palette.mode === 'dark'
+                        ? `${appTheme?.palette.primary.main}20`
+                        : `${appTheme?.palette.primary.main}15`,
+                      fontWeight: "bold",
                     },
                     open
                       ? {
@@ -176,8 +172,9 @@ export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, a
             ))}
             <Divider sx={{ my: 1 }} />
           </React.Fragment>
-        ))}
-      </List>
+        ))
+        }
+      </List >
     );
   };
 
@@ -341,10 +338,8 @@ const Drawer = styled(MuiDrawer, {
         ...openedMixin(theme),
         "& .MuiDrawer-paper": {
           ...openedMixin(theme),
-          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.6)' : 'rgba(255, 255, 255, 0.6)',
-          backdropFilter: 'blur(20px)',
+          backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
           borderRight: `1px solid ${theme.palette.divider}`,
-          boxShadow: theme.palette.mode === 'dark' ? '5px 0 30px rgba(0,0,0,0.5)' : '5px 0 30px rgba(0,0,0,0.05)',
         },
       },
     },
@@ -354,8 +349,7 @@ const Drawer = styled(MuiDrawer, {
         ...closedMixin(theme),
         "& .MuiDrawer-paper": {
           ...closedMixin(theme),
-          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.6)' : 'rgba(255, 255, 255, 0.6)',
-          backdropFilter: 'blur(20px)',
+          backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
           borderRight: `1px solid ${theme.palette.divider}`,
         },
       },

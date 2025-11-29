@@ -1,5 +1,6 @@
 import {
   AccountTree,
+  Code,
   DataObject,
   Difference,
   FactCheck,
@@ -10,12 +11,14 @@ import {
 import { Home } from "@mui/icons-material";
 import LandingPage from "../pages/LandingPage";
 import { DifferenceUtility } from "../pages/DifferenceUtilityPage";
+import { EncoderDecoderPage } from "../pages/EncoderDecoderPage";
 import { JSONFormatter } from "../pages/JSONFormatterPage";
 import { JSONPathUtility } from "../pages/JSONPathUtilityPage";
 import { JSONSchemaValidator } from "../pages/JSONSchemaPage";
 import { JSONTreeViewer } from "../pages/JSONTreeViewerPage";
 import JWTNodes from "../pages/JWTNodes";
 import { JWTUtility } from "../pages/JWTUtilityPage";
+import { ValidatorPage } from "../pages/ValidatorPage";
 import { Utility } from "../types/UtilityInterace";
 
 export const mainUtilities: { [key: string]: Utility } = {
@@ -86,4 +89,21 @@ export const extraUtilities: { [key: string]: Utility } = {
     toolName: "JWT Decoder",
     category: "JWT Tools",
   },
+  ENCODER_DECODER: {
+    component: <EncoderDecoderPage />,
+    navIcon: <Code />,
+    isOpen: false,
+    tooltip: "URL & Base64 Encoder/Decoder",
+    toolName: "Encoder / Decoder",
+    category: "Utilities",
+  },
+  VALIDATOR: {
+    component: <ValidatorPage />,
+    navIcon: <FactCheck />,
+    isOpen: false,
+    tooltip: "JSON, XML, YAML Validator",
+    toolName: "Validator",
+    category: "Utilities",
+  },
 };
+

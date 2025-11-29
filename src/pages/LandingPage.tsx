@@ -58,29 +58,29 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
             setIsDeleting(false);
             setWordIndex((prev) => (prev + 1) % words.length);
         } else {
-            timeout = setTimeout(type, isDeleting ? 50 : 150);
+            timeout = setTimeout(type, isDeleting ? 50 : 50);
         }
 
         return () => clearTimeout(timeout);
     }, [text, isDeleting, wordIndex]);
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Box sx={{ textAlign: "center", mb: 8, mt: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
+            <Box sx={{ textAlign: "center", mb: 4, mt: 2 }}>
                 <Typography
                     variant="h1"
                     component="h1"
                     gutterBottom
                     sx={{
                         fontWeight: 900,
-                        fontSize: { xs: "3rem", md: "5rem" },
+                        fontSize: { xs: "2.5rem", md: "4rem" },
                         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 50%, ${theme.palette.primary.main} 100%)`,
                         backgroundSize: '200% auto',
                         backgroundClip: "text",
                         textFillColor: "transparent",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
-                        mb: 2,
+                        mb: 1,
                         letterSpacing: "-0.03em",
                         animation: 'gradient 5s ease infinite',
                         filter: theme.palette.mode === 'dark'
@@ -103,7 +103,7 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                         mx: "auto",
                         lineHeight: 1.6,
                         opacity: 0.8,
-                        fontSize: { xs: "1.1rem", md: "1.5rem" },
+                        fontSize: { xs: "1rem", md: "1.25rem" },
                         fontWeight: 300,
                     }}
                 >
@@ -111,7 +111,7 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                 </Typography>
             </Box>
 
-            <Grid2 container spacing={4} alignItems="flex-start">
+            <Grid2 container spacing={3} alignItems="flex-start">
                 {Object.entries(
                     Object.values(allUtilities)
                         .filter((utility) => utility.toolName !== "Home")
@@ -125,16 +125,16 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                         }, {} as { [key: string]: Utility[] })
                 ).map(([category, utilities]) => (
                     <Grid2 size={{ xs: 12, md: 4 }} key={category}>
-                        <Box sx={{ mb: 2 }}>
+                        <Box sx={{ mb: 1 }}>
                             <Stack
                                 direction="row"
                                 alignItems="center"
                                 spacing={2}
                                 sx={{
-                                    mb: 3,
+                                    mb: 2,
                                     display: "inline-flex",
-                                    p: 1,
-                                    pr: 3,
+                                    p: 0.75,
+                                    pr: 2,
                                     borderRadius: 50,
                                     background: theme.palette.mode === 'dark'
                                         ? 'linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
@@ -149,12 +149,12 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                 <Box sx={{
                                     color: theme.palette.primary.main,
                                     display: 'flex',
-                                    p: 1,
+                                    p: 0.75,
                                     borderRadius: '50%',
                                     background: `linear-gradient(135deg, ${theme.palette.primary.main}20, ${theme.palette.secondary.main}20)`,
                                     boxShadow: `0 0 10px ${theme.palette.primary.main}30`
                                 }}>
-                                    {categoryIcons[category] || <Category fontSize="medium" />}
+                                    {categoryIcons[category] || <Category fontSize="small" />}
                                 </Box>
                                 <Typography
                                     variant="h6"
@@ -164,14 +164,14 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                         color: theme.palette.text.primary,
                                         letterSpacing: '0.02em',
                                         textTransform: 'uppercase',
-                                        fontSize: '0.9rem',
+                                        fontSize: '0.8rem',
                                         opacity: 0.9
                                     }}
                                 >
                                     {category}
                                 </Typography>
                             </Stack>
-                            <Grid2 container spacing={2}>
+                            <Grid2 container spacing={1.5}>
                                 {utilities.map((utility) => (
                                     <Grid2 size={12} key={utility.toolName}>
                                         <Card
@@ -185,7 +185,7 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                                     : 'rgba(255, 255, 255, 0.7)',
                                                 backdropFilter: 'blur(20px)',
                                                 border: `1px solid ${theme.palette.divider}`,
-                                                borderRadius: 3,
+                                                borderRadius: 2,
                                                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                                 position: 'relative',
                                                 overflow: 'visible',
@@ -196,7 +196,7 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                                     left: 0,
                                                     right: 0,
                                                     bottom: 0,
-                                                    borderRadius: 3,
+                                                    borderRadius: 2,
                                                     padding: '2px',
                                                     background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                                                     mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
@@ -206,7 +206,7 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                                     pointerEvents: 'none',
                                                 },
                                                 "&:hover": {
-                                                    transform: "translateY(-4px)",
+                                                    transform: "translateY(-2px)",
                                                     boxShadow: theme.palette.mode === 'dark'
                                                         ? `0 8px 20px -6px ${theme.palette.primary.main}40`
                                                         : `0 8px 20px -6px ${theme.palette.primary.main}30`,
@@ -223,24 +223,24 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                                     display: "flex",
                                                     flexDirection: "row",
                                                     alignItems: "center",
-                                                    p: 2,
+                                                    p: 1.5,
                                                     height: '100%'
                                                 }}
                                             >
                                                 <Box
                                                     sx={{
-                                                        p: 1,
-                                                        borderRadius: 2,
+                                                        p: 0.75,
+                                                        borderRadius: 1.5,
                                                         background: `linear-gradient(135deg, ${theme.palette.primary.main}20, ${theme.palette.secondary.main}20)`,
                                                         color: theme.palette.primary.main,
-                                                        mr: 2,
+                                                        mr: 1.5,
                                                         display: 'flex',
                                                         transition: 'transform 0.3s ease',
                                                         ".MuiCard-root:hover &": {
                                                             transform: 'scale(1.1) rotate(5deg)',
                                                         },
                                                         "& svg": {
-                                                            fontSize: "1.5rem"
+                                                            fontSize: "1.25rem"
                                                         }
                                                     }}
                                                 >
@@ -252,7 +252,7 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                                         variant="subtitle1"
                                                         component="h2"
                                                         fontWeight="700"
-                                                        sx={{ mb: 0.5, fontSize: '0.95rem' }}
+                                                        sx={{ mb: 0.25, fontSize: '0.9rem' }}
                                                     >
                                                         {utility.toolName}
                                                     </Typography>
@@ -260,9 +260,9 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                                                         variant="caption"
                                                         color="text.secondary"
                                                         sx={{
-                                                            lineHeight: 1.5,
+                                                            lineHeight: 1.4,
                                                             opacity: 0.85,
-                                                            fontSize: '0.8rem',
+                                                            fontSize: '0.75rem',
                                                             display: '-webkit-box',
                                                             WebkitLineClamp: 2,
                                                             WebkitBoxOrient: 'vertical',
@@ -282,7 +282,7 @@ export default function LandingPage({ setUtility, allUtilities }: LandingPagePro
                 ))}
             </Grid2>
 
-            <Box sx={{ mt: 8, mb: 4, textAlign: 'center' }}>
+            <Box sx={{ mt: 4, mb: 2, textAlign: 'center' }}>
                 <Typography
                     variant="body2"
                     color="text.secondary"

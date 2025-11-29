@@ -1,5 +1,5 @@
 import { Editor, OnMount } from "@monaco-editor/react";
-import { Add, Close, Edit, Settings } from "@mui/icons-material";
+import { Add, Close, Edit, Lock, LockOpen, MoreVert, Settings } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -64,6 +64,7 @@ interface EditorTab {
   id: string;
   name: string;
   content: string;
+  isLocked?: boolean;
 }
 
 export const JSONFormatter: React.FC<UtilityProps> = ({
@@ -81,7 +82,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
   // --- Tab Management State ---
   const [tabs, setTabs] = useLocalStorage<EditorTab[]>("json-editor-tabs", [
-    { id: "1", name: "JSON 1", content: JSON.stringify(editorData, null, 2) },
+    { id: "1", name: "Default", content: JSON.stringify(editorData, null, 2), isLocked: true },
   ]);
   const [activeTabId, setActiveTabId] = useLocalStorage<string>(
     "json-editor-active-tab",
@@ -93,8 +94,9 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     if (!tabs || tabs.length === 0) {
       const initialTab = {
         id: "1",
-        name: "JSON 1",
+        name: "Default",
         content: JSON.stringify(defaultEditorJSON, null, 2),
+        isLocked: true,
       };
       setTabs([initialTab]);
       setActiveTabId("1");
@@ -111,18 +113,48 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   const handleAddTab = () => {
     if (!tabs) return;
     const newId = (Math.max(...tabs.map((t) => parseInt(t.id))) + 1).toString();
-    const newTab = { id: newId, name: `JSON ${newId}`, content: "" };
+    const jsonTabs = tabs.filter(t => t.name.startsWith("JSON "));
+    const maxNum = jsonTabs.length > 0
+      ? Math.max(...jsonTabs.map(t => parseInt(t.name.replace("JSON ", ""))))
+      : 0;
+    const newNum = maxNum + 1;
+    const newTab = { id: newId, name: `JSON ${newNum}`, content: "" };
     setTabs([...tabs, newTab]);
     setActiveTabId(newId);
     setTreeView(false);
   };
 
-  // --- Context Menu (Rename) ---
+  // --- Context Menu (Rename & Lock) ---
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
     tabId: string;
   } | null>(null);
+
+  // --- Header Menu (Close All) ---
+  const [headerMenuAnchor, setHeaderMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const handleHeaderMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setHeaderMenuAnchor(event.currentTarget);
+  };
+
+  const handleHeaderMenuClose = () => {
+    setHeaderMenuAnchor(null);
+  };
+
+  const handleCloseAllUnlocked = () => {
+    if (!tabs) return;
+    const lockedTabs = tabs.filter(t => t.isLocked);
+    // If active tab is being closed, switch to the last locked tab (usually Default)
+    const activeTabIsLocked = tabs.find(t => t.id === activeTabId)?.isLocked;
+
+    setTabs(lockedTabs);
+
+    if (!activeTabIsLocked) {
+      setActiveTabId(lockedTabs[lockedTabs.length - 1].id);
+    }
+    handleHeaderMenuClose();
+  };
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [newName, setNewName] = useState("");
@@ -168,15 +200,27 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     setRenamingTabId(null);
   };
 
+  const handleToggleLock = () => {
+    if (contextMenu && tabs) {
+      const updatedTabs = tabs.map((t) =>
+        t.id === contextMenu.tabId ? { ...t, isLocked: !t.isLocked } : t
+      );
+      setTabs(updatedTabs);
+    }
+    handleCloseContextMenu();
+  };
+
   // --- Close Warning ---
   const [closeWarningOpen, setCloseWarningOpen] = useState(false);
   const [tabToClose, setTabToClose] = useState<string | null>(null);
 
   const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
     e.stopPropagation();
+    const tab = tabs?.find((t) => t.id === tabId);
+    if (tab?.isLocked) return; // Prevent closing locked tabs
+
     if (!tabs || tabs.length <= 1) return;
 
-    const tab = tabs.find((t) => t.id === tabId);
     // Check if tab has meaningful content
     const hasContent =
       tab?.content &&
@@ -515,8 +559,30 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
             : undefined
         }
       >
-        <MenuItem onClick={handleRenameClick}>
+        <MenuItem onClick={handleRenameClick} disabled={tabs?.find(t => t.id === contextMenu?.tabId)?.isLocked}>
           <Edit fontSize="small" sx={{ mr: 1 }} /> Rename
+        </MenuItem>
+        <MenuItem onClick={handleToggleLock}>
+          {tabs?.find(t => t.id === contextMenu?.tabId)?.isLocked ? (
+            <>
+              <LockOpen fontSize="small" sx={{ mr: 1 }} /> Unlock
+            </>
+          ) : (
+            <>
+              <Lock fontSize="small" sx={{ mr: 1 }} /> Lock
+            </>
+          )}
+        </MenuItem>
+      </Menu>
+
+      {/* Header Menu */}
+      <Menu
+        anchorEl={headerMenuAnchor}
+        open={Boolean(headerMenuAnchor)}
+        onClose={handleHeaderMenuClose}
+      >
+        <MenuItem onClick={handleCloseAllUnlocked}>
+          <Close fontSize="small" sx={{ mr: 1 }} /> Close All Unlocked
         </MenuItem>
       </Menu>
 
@@ -591,7 +657,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
             sx={{
               flexGrow: 1,
               position: "relative",
-              overflow: 'hidden',
+              overflow: isTreeView ? 'auto' : 'hidden',
               borderRadius: 3,
               background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.7)',
               backdropFilter: 'blur(20px)',
@@ -639,26 +705,44 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
           >
             <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
-                  Open Files
-                </Typography>
-                <Tooltip title="New File">
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Tooltip title="New File">
+                    <IconButton
+                      onClick={handleAddTab}
+                      size="small"
+                      sx={{
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        width: 32,
+                        height: 32,
+                        '&:hover': {
+                          bgcolor: 'primary.dark',
+                          transform: 'scale(1.05)',
+                          transition: 'transform 0.2s'
+                        }
+                      }}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
+                    New Tab
+                  </Typography>
+                </Stack>
+                <Tooltip title="More Options">
                   <IconButton
-                    onClick={handleAddTab}
+                    onClick={handleHeaderMenuOpen}
                     size="small"
                     sx={{
-                      bgcolor: 'primary.main',
-                      color: 'white',
                       width: 32,
                       height: 32,
+                      ml: 0.5,
                       '&:hover': {
-                        bgcolor: 'primary.dark',
-                        transform: 'scale(1.05)',
-                        transition: 'transform 0.2s'
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
                       }
                     }}
                   >
-                    <Add fontSize="small" />
+                    <MoreVert fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Stack>
@@ -687,7 +771,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                       <Typography variant="body2" noWrap sx={{ maxWidth: 160, fontWeight: activeTabId === tab.id ? 600 : 400, fontSize: '0.9rem' }}>
                         {tab.name}
                       </Typography>
-                      {tabs.length > 1 && (
+                      {tab.isLocked && <Lock fontSize="small" sx={{ fontSize: '0.8rem', opacity: 0.5, mr: 1 }} />}
+                      {!tab.isLocked && tabs.length > 1 && (
                         <IconButton
                           size="small"
                           onClick={(e) => handleCloseTab(e, tab.id)}

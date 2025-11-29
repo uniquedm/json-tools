@@ -323,9 +323,16 @@ const JWTNodes: React.FC<UtilityProps> = ({ setSnackbarConfig }) => {
         </Panel>
         <Panel position={"bottom-right"}>
           <Typography
-            sx={{ color: alpha(theme.palette.text.primary, 0.1) }}
-            variant="button"
-            fontSize={56}
+            sx={{
+              color: alpha(theme.palette.text.primary, 0.1),
+              fontWeight: 900,
+              userSelect: 'none',
+              pointerEvents: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.2rem'
+            }}
+            variant="h1"
+            fontSize={96}
           >
             {mode}
           </Typography>

@@ -27,3 +27,4 @@ export default defineConfig({
   base: "/json-tools",
   build: { chunkSizeWarningLimit: 1600 },
 });
+// Trigger restart
