@@ -95,9 +95,9 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   theme = darkTheme,
   setEditorData,
 }) => {
-  const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
+  const monacoTheme = theme.palette.mode === "dark" ? "vs-dark" : "light";
   const jsonEditorTheme =
-    theme === darkTheme ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
+    theme.palette.mode === "dark" ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
   // Initialize state for the input value
   const [pathValue, setPathValue] = useState<any>("$");
   const [queries, setQueries] = React.useState(
@@ -462,7 +462,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   );
 };
 
-const StyledPaper = styled(Paper)(({}) => ({
+const StyledPaper = styled(Paper)(({ }) => ({
   backgroundColor: "rgba(0, 0, 0, 0.1)",
   backdropFilter: "blur(10px)",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",

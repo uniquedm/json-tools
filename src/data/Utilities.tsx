@@ -7,6 +7,8 @@ import {
   Security,
   Verified,
 } from "@mui/icons-material";
+import { Home } from "@mui/icons-material";
+import LandingPage from "../pages/LandingPage";
 import { DifferenceUtility } from "../pages/DifferenceUtilityPage";
 import { JSONFormatter } from "../pages/JSONFormatterPage";
 import { JSONPathUtility } from "../pages/JSONPathUtilityPage";
@@ -17,12 +19,19 @@ import { JWTUtility } from "../pages/JWTUtilityPage";
 import { Utility } from "../types/UtilityInterace";
 
 export const mainUtilities: { [key: string]: Utility } = {
+  HOME: {
+    component: <LandingPage setUtility={() => { }} allUtilities={{}} />, // Placeholder prop, will be overwritten by renderUtility
+    navIcon: <Home />,
+    isOpen: true,
+    tooltip: "Home",
+    toolName: "Home",
+  },
   FORMAT: {
     component: <JSONFormatter />,
     navIcon: <DataObject />,
     isOpen: true,
-    tooltip: "JSON Formatting Tools",
-    toolName: "JSON Formatter",
+    tooltip: "JSON Editor & Formatter",
+    toolName: "JSON Editor",
   },
   TREEVIEW: {
     component: <JSONTreeViewer />,

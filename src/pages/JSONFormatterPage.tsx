@@ -1,19 +1,31 @@
 import { Editor, OnMount } from "@monaco-editor/react";
-import { Settings } from "@mui/icons-material";
+import { Add, Close, Edit, Settings } from "@mui/icons-material";
 import {
   Box,
+  Button,
   ButtonGroup,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Grid2,
   IconButton,
+  Menu,
+  MenuItem,
   Paper,
   Skeleton,
   Stack,
+  Tab,
+  Tabs,
+  TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import * as monacoEditor from "monaco-editor";
-import React, { useState } from "react";
-import { useLocalStorage, useSessionStorage } from "react-use";
+import React, { useEffect, useState } from "react";
+import { useLocalStorage } from "react-use";
 import EditorFAB from "../components/EditorFAB";
 import ExtraOptions from "../components/menus/ExtraOptions";
 import { settingTabs } from "../components/menus/JSONFormatterSettings";
@@ -48,20 +60,159 @@ import {
 } from "../utils/JSONFormatUtils";
 import { jsonTreeEditor } from "./JSONTreeViewerPage";
 
+interface EditorTab {
+  id: string;
+  name: string;
+  content: string;
+}
+
 export const JSONFormatter: React.FC<UtilityProps> = ({
   editorData = defaultEditorJSON,
-  setEditorData,
+  setEditorData: _setEditorData,
   theme = darkTheme,
   setSnackbarConfig,
 }) => {
-  const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
-  // Correctly type the editorRef to be a monaco editor instance or null
+  const monacoTheme = theme.palette.mode === "dark" ? "vs-dark" : "light";
   const editorRef =
     React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
 
   const [isTreeView, setTreeView] = useState(false);
-
   const [settings, toggleSettings] = useState<boolean>(false);
+
+  // --- Tab Management State ---
+  const [tabs, setTabs] = useLocalStorage<EditorTab[]>("json-editor-tabs", [
+    { id: "1", name: "JSON 1", content: JSON.stringify(editorData, null, 2) },
+  ]);
+  const [activeTabId, setActiveTabId] = useLocalStorage<string>(
+    "json-editor-active-tab",
+    "1"
+  );
+
+  // Ensure there's always at least one tab
+  useEffect(() => {
+    if (!tabs || tabs.length === 0) {
+      const initialTab = {
+        id: "1",
+        name: "JSON 1",
+        content: JSON.stringify(defaultEditorJSON, null, 2),
+      };
+      setTabs([initialTab]);
+      setActiveTabId("1");
+    }
+  }, [tabs, setTabs, setActiveTabId]);
+
+  const activeTab = tabs?.find((t) => t.id === activeTabId) || tabs?.[0];
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setActiveTabId(newValue);
+    setTreeView(false);
+  };
+
+  const handleAddTab = () => {
+    if (!tabs) return;
+    const newId = (Math.max(...tabs.map((t) => parseInt(t.id))) + 1).toString();
+    const newTab = { id: newId, name: `JSON ${newId}`, content: "" };
+    setTabs([...tabs, newTab]);
+    setActiveTabId(newId);
+    setTreeView(false);
+  };
+
+  // --- Context Menu (Rename) ---
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+    tabId: string;
+  } | null>(null);
+
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [renamingTabId, setRenamingTabId] = useState<string | null>(null);
+
+  const handleContextMenu = (event: React.MouseEvent, tabId: string) => {
+    event.preventDefault();
+    setContextMenu(
+      contextMenu === null
+        ? {
+          mouseX: event.clientX + 2,
+          mouseY: event.clientY - 6,
+          tabId: tabId,
+        }
+        : null
+    );
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  const handleRenameClick = () => {
+    if (contextMenu) {
+      const tab = tabs?.find((t) => t.id === contextMenu.tabId);
+      if (tab) {
+        setNewName(tab.name);
+        setRenamingTabId(contextMenu.tabId); // Store the ID separately
+        setRenameDialogOpen(true);
+      }
+    }
+    handleCloseContextMenu();
+  };
+
+  const handleRenameSubmit = () => {
+    if (tabs && renamingTabId) {
+      const updatedTabs = tabs.map((t) =>
+        t.id === renamingTabId ? { ...t, name: newName } : t
+      );
+      setTabs(updatedTabs);
+    }
+    setRenameDialogOpen(false);
+    setRenamingTabId(null);
+  };
+
+  // --- Close Warning ---
+  const [closeWarningOpen, setCloseWarningOpen] = useState(false);
+  const [tabToClose, setTabToClose] = useState<string | null>(null);
+
+  const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
+    e.stopPropagation();
+    if (!tabs || tabs.length <= 1) return;
+
+    const tab = tabs.find((t) => t.id === tabId);
+    // Check if tab has meaningful content
+    const hasContent =
+      tab?.content &&
+      tab.content.trim() !== "" &&
+      tab.content.trim() !== "{}" &&
+      tab.content.trim() !== "[]";
+
+    if (hasContent) {
+      setTabToClose(tabId);
+      setCloseWarningOpen(true);
+    } else {
+      confirmCloseTab(tabId);
+    }
+  };
+
+  const confirmCloseTab = (tabId: string) => {
+    if (!tabs) return;
+    const newTabs = tabs.filter((t) => t.id !== tabId);
+    setTabs(newTabs);
+
+    if (activeTabId === tabId) {
+      setActiveTabId(newTabs[newTabs.length - 1].id);
+    }
+    setCloseWarningOpen(false);
+    setTabToClose(null);
+  };
+
+  const updateActiveTabContent = (newContent: string) => {
+    if (!tabs) return;
+    const updatedTabs = tabs.map((tab) =>
+      tab.id === activeTabId ? { ...tab, content: newContent } : tab
+    );
+    setTabs(updatedTabs);
+  };
+
+  // ---------------------------
 
   const handleEditorDidMount: OnMount = (editor, _monaco) => {
     editorRef.current = editor;
@@ -139,7 +290,10 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
   const handleLoadFile = () => {
     setTreeView(false);
-    loadFile(editorRef, setSnackbarConfig, setEditorData);
+    const setContentWrapper = (data: any) => {
+      updateActiveTabContent(JSON.stringify(data, null, 2));
+    };
+    loadFile(editorRef, setSnackbarConfig, setContentWrapper);
   };
 
   const handlePrint = () => {
@@ -164,7 +318,6 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   });
 
   const handleSettingsReset = () => {
-    // Default Values
     toggleLabel(true);
     setFlattenDelimiter(".");
     toggleFlattenSafe(false);
@@ -184,14 +337,13 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     toggleLabel(event.target.checked);
   };
 
-  // Flatten / Unflatten
   const [flattenDelimiter, setFlattenDelimiter, _removeFlattenDelimiter] =
-    useLocalStorage("flat-delimiter", "."); // Default delimiter is a period (.)
+    useLocalStorage("flat-delimiter", ".");
 
   const handleDelimiterChange = (event: {
     target: { value: React.SetStateAction<string | undefined> };
   }) => {
-    setFlattenDelimiter(event.target.value); // Update delimiter based on user input
+    setFlattenDelimiter(event.target.value);
   };
 
   const [flattenSafe, toggleFlattenSafe, _removeFlattenSafe] = useLocalStorage(
@@ -244,7 +396,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   };
 
   const settingsProps: JSONFormatterSettings = {
-    isLabeled: isLabeled, // Initial value
+    isLabeled: isLabeled,
     handleLabelChange: handleLabelChange,
     flattenSafe: flattenSafe,
     handleFlattenSafe: handleFlattenSafe,
@@ -265,13 +417,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
       ? jsonEditCustomDarkTheme
       : jsonEditCustomTheme;
 
-  const [editorContent, setEditorContent] = useSessionStorage(
-    "editorContent",
-    JSON.stringify(editorData, null, 2)
-  );
-
   const getTreeView = () => {
-    if (!editorContent || !editorContent.trim()) {
+    if (!activeTab?.content || !activeTab.content.trim()) {
       if (setSnackbarConfig)
         setSnackbarConfig({
           open: true,
@@ -284,7 +431,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     }
 
     try {
-      const parsedJson = JSON.parse(editorContent);
+      const parsedJson = JSON.parse(activeTab.content);
       return jsonTreeEditor(true, 99, [], jsonEditorTheme, parsedJson);
     } catch (error) {
       if (setSnackbarConfig) {
@@ -300,7 +447,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   };
 
   const handleEditorChange = (value: string | undefined) => {
-    setEditorContent(value ?? "");
+    updateActiveTabContent(value ?? "");
   };
 
   return (
@@ -311,9 +458,71 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         setOpen={toggleSettings}
         resetSettings={handleSettingsReset}
       />
+
+      {/* Rename Dialog */}
+      <Dialog open={renameDialogOpen} onClose={() => setRenameDialogOpen(false)}>
+        <DialogTitle>Rename Tab</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Tab Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleRenameSubmit();
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRenameDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleRenameSubmit} variant="contained">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Close Warning Dialog */}
+      <Dialog
+        open={closeWarningOpen}
+        onClose={() => setCloseWarningOpen(false)}
+      >
+        <DialogTitle>Unsaved Changes</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This tab contains data. Are you sure you want to close it? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCloseWarningOpen(false)}>Cancel</Button>
+          <Button onClick={() => tabToClose && confirmCloseTab(tabToClose)} color="error" variant="contained" autoFocus>
+            Close Tab
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Context Menu */}
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleCloseContextMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem onClick={handleRenameClick}>
+          <Edit fontSize="small" sx={{ mr: 1 }} /> Rename
+        </MenuItem>
+      </Menu>
+
       <Grid2 container sx={{ mt: 4 }} spacing={2}>
         <Grid2 size={12}>
-          <Paper>
+          <Paper elevation={0} sx={{ bgcolor: 'transparent' }}>
             <Stack sx={{ m: 0, p: 0.5 }} spacing={1} direction="row">
               <ExtraOptions
                 handleFileLoad={handleLoadFile}
@@ -334,10 +543,10 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
               <ButtonGroup
                 sx={{
                   "& .MuiButton-root": {
-                    border: "none", // Remove border from each button
+                    border: "none",
                   },
                   "& .MuiButtonGroup-grouped:not(:last-of-type)": {
-                    borderRight: "none", // Remove the dividing line between buttons
+                    borderRight: "none",
                   },
                 }}
                 disableElevation
@@ -351,18 +560,19 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
             </Stack>
           </Paper>
         </Grid2>
-        <Grid2 size={12}>
-          <Box sx={{ position: "relative" }}>
-            {" "}
-            {/* Set Box to relative positioning */}
+
+        {/* Main Content Area with Vertical Tabs */}
+        <Grid2 size={12} sx={{ display: 'flex', flexDirection: 'row', height: '70vh', gap: 2 }}>
+          {/* Editor Area */}
+          <Paper elevation={3} sx={{ flexGrow: 1, position: "relative", overflow: 'hidden', borderRadius: 2 }}>
             {!isTreeView && (
               <Editor
                 theme={monacoTheme}
-                value={editorContent}
+                value={activeTab?.content || ""}
                 onChange={handleEditorChange}
-                height={"70vh"}
+                height={"100%"}
                 defaultLanguage="json"
-                options={{ minimap: { enabled: editorMinimap } }}
+                options={{ minimap: { enabled: editorMinimap }, padding: { top: 16 } }}
                 loading={<Skeleton variant="rounded" animation="wave" />}
                 onMount={handleEditorDidMount}
               />
@@ -372,7 +582,83 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
               isTreeView={isTreeView}
               toggleTreeView={toggleTreeView}
             />
-          </Box>
+          </Paper>
+
+          {/* Vertical Tabs Area */}
+          <Paper elevation={3} sx={{ width: 280, display: 'flex', flexDirection: 'column', borderRadius: 2, overflow: 'hidden' }}>
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
+                  Open Files
+                </Typography>
+                <Tooltip title="New File">
+                  <IconButton onClick={handleAddTab} size="small" sx={{ bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}>
+                    <Add fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Box>
+            <Tabs
+              orientation="vertical"
+              variant="scrollable"
+              value={activeTabId}
+              onChange={handleTabChange}
+              sx={{
+                flexGrow: 1,
+                '& .MuiTabs-indicator': {
+                  left: 0,
+                  width: 4,
+                  borderRadius: '0 4px 4px 0'
+                }
+              }}
+            >
+              {tabs?.map((tab) => (
+                <Tab
+                  key={tab.id}
+                  value={tab.id}
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', py: 1 }}>
+                      <Typography variant="body2" noWrap sx={{ maxWidth: 180, fontWeight: activeTabId === tab.id ? 600 : 400 }}>
+                        {tab.name}
+                      </Typography>
+                      {tabs.length > 1 && (
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleCloseTab(e, tab.id)}
+                          sx={{
+                            opacity: 0,
+                            transition: 'opacity 0.2s',
+                            padding: 0.5,
+                            '&:hover': { bgcolor: 'error.light', color: 'error.contrastText' }
+                          }}
+                          className="close-btn"
+                        >
+                          <Close fontSize="small" sx={{ fontSize: '1rem' }} />
+                        </IconButton>
+                      )}
+                    </Box>
+                  }
+                  onContextMenu={(e) => handleContextMenu(e, tab.id)}
+                  sx={{
+                    alignItems: 'flex-start',
+                    textAlign: 'left',
+                    minHeight: 56,
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    textTransform: 'none',
+                    '&:hover': {
+                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                      '& .close-btn': { opacity: 0.7 }
+                    },
+                    '&.Mui-selected': {
+                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                      '& .close-btn': { opacity: 1 }
+                    }
+                  }}
+                />
+              ))}
+            </Tabs>
+          </Paper>
         </Grid2>
       </Grid2>
     </Box>

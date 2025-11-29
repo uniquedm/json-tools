@@ -23,7 +23,7 @@ import { UtilityProps } from "../types/DrawerTypes";
 export const DifferenceUtility: React.FC<UtilityProps> = ({
   theme = darkTheme,
 }) => {
-  const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
+  const monacoTheme = theme.palette.mode === "dark" ? "vs-dark" : "light";
   const [editorLanguage, setEditorLanguage] = React.useState("json");
 
   const handleChange = (event: SelectChangeEvent) => {

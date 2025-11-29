@@ -2,9 +2,9 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { styled, useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
-import { darkTheme, lightTheme, ThemeInput } from "../../data/Themes";
+import { ThemeInput } from "../../data/Themes";
 
-export default function DarkModeSwitch({ setTheme }: ThemeInput) {
+export default function DarkModeSwitch({ toggleThemeMode }: ThemeInput) {
   const currentTheme = useTheme();
   return (
     <FormGroup>
@@ -12,8 +12,8 @@ export default function DarkModeSwitch({ setTheme }: ThemeInput) {
         control={
           <MaterialUISwitch
             checked={currentTheme.palette.mode == "dark"}
-            onChange={(_event, checked) => {
-              checked ? setTheme(darkTheme) : setTheme(lightTheme);
+            onChange={(_event, _checked) => {
+              if (toggleThemeMode) toggleThemeMode();
             }}
             sx={{ m: 1 }}
           />
@@ -44,7 +44,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
         opacity: 1,
         backgroundColor: "#aab4be",
         ...theme.applyStyles("dark", {
-          backgroundColor: darkTheme.palette.primary.main,
+          backgroundColor: theme.palette.primary.main,
         }),
       },
     },

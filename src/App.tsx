@@ -1,23 +1,28 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import { Theme, ThemeProvider } from "@mui/material/styles";
-import { SetStateAction, useState } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+
 import { Helmet } from "react-helmet";
 import { Route, HashRouter as Router, Routes } from "react-router-dom";
 import { useLocalStorage } from "react-use";
 import "./App.css";
 import AppDrawer from "./components/drawer/AppDrawer";
-import { darkTheme, lightTheme } from "./data/Themes";
+import { getTheme } from "./data/Themes";
 
 function Home() {
-  const [savedTheme, setSavedTheme] = useLocalStorage("app-theme", "dark");
-  const [theme, setAppTheme] = useState(
-    savedTheme == "light" ? lightTheme : darkTheme
-  );
+  const [savedThemeMode, setSavedThemeMode] = useLocalStorage<"light" | "dark">("app-theme-mode", "dark");
+  const [savedAccentColor, setSavedAccentColor] = useLocalStorage("app-accent-color", "#00B0FF");
 
-  // Custom function to set theme and update savedTheme
-  const setTheme = (newTheme: SetStateAction<Theme>) => {
-    setAppTheme(newTheme);
-    setSavedTheme(newTheme === lightTheme ? "light" : "dark");
+  const themeMode = savedThemeMode || "dark";
+  const accentColor = savedAccentColor || "#00B0FF";
+
+  const theme = getTheme(themeMode, accentColor);
+
+  const toggleThemeMode = () => {
+    setSavedThemeMode(themeMode === "light" ? "dark" : "light");
+  };
+
+  const handleSetAccentColor = (color: string) => {
+    setSavedAccentColor(color);
   };
 
   return (
@@ -78,13 +83,25 @@ function Home() {
           content="JSON Tools - Manipulate JSON Effortlessly"
         />
         <meta
-          property="twitter:description"
           content="Edit and manipulate JSON files effortlessly with our powerful web tool."
+        />
+        <meta
+          property="og:image"
+          content="https://uniquedm.github.io/json-tools/og-image.png"
+        />
+        <meta
+          name="twitter:image"
+          content="https://uniquedm.github.io/json-tools/og-image.png"
         />
         <link rel="canonical" href="https://uniquedm.github.io/json-tools/" />
       </Helmet>
       <CssBaseline />
-      <AppDrawer setTheme={setTheme} appTheme={theme} />
+      <AppDrawer
+        toggleThemeMode={toggleThemeMode}
+        appTheme={theme}
+        setAccentColor={handleSetAccentColor}
+        accentColor={accentColor}
+      />
     </ThemeProvider>
   );
 }

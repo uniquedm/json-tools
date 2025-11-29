@@ -41,7 +41,7 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
   theme = darkTheme,
 }) => {
   const jsonEditorTheme =
-    theme === darkTheme ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
+    theme.palette.mode === "dark" ? jsonEditCustomDarkTheme : jsonEditCustomTheme;
   const [options, setOptions] = React.useState(() => ["Add", "Edit", "Delete"]);
   const actionList: JSONEditAction[] = [
     {
@@ -177,25 +177,25 @@ export function jsonTreeEditor(
   editorData:
     | Record<string, any>
     | {
-        stringField: string;
-        numberField: number;
-        booleanField: boolean;
-        nullField: null;
-        arrayField: (
-          | string
-          | number
-          | boolean
-          | { nestedObject: string }
-          | null
-        )[];
-        objectField: {
-          nestedString: string;
-          nestedNumber: number;
-          nestedBoolean: boolean;
-          nestedArray: number[];
-          nestedObject: { deepNestedField: string };
-        };
-      }
+      stringField: string;
+      numberField: number;
+      booleanField: boolean;
+      nullField: null;
+      arrayField: (
+        | string
+        | number
+        | boolean
+        | { nestedObject: string }
+        | null
+      )[];
+      objectField: {
+        nestedString: string;
+        nestedNumber: number;
+        nestedBoolean: boolean;
+        nestedArray: number[];
+        nestedObject: { deepNestedField: string };
+      };
+    }
 ) {
   return (
     <JsonEditor

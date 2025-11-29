@@ -1,24 +1,63 @@
 import { createTheme, Theme } from "@mui/material/styles";
 import { Dispatch, SetStateAction } from "react";
 
-export const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#ff5252",
-    },
-  },
-});
+export const accentColors = {
+  DeepPurple: "#6200ea",
+  OceanBlue: "#0069c0",
+  CrimsonRed: "#d50000",
+  Teal: "#00bfa5",
+  Amber: "#ffab00",
+  Graphite: "#37474f",
+};
 
-export const lightTheme = createTheme({
-  palette: {
-    mode: "light",
-  },
-});
+export const getTheme = (mode: "light" | "dark", accentColor: string): Theme => {
+  return createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: accentColor,
+      },
+      background: {
+        default: mode === "dark" ? "#121212" : "#f5f5f5",
+        paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
+      },
+    },
+    typography: {
+      fontFamily: "'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif",
+      button: {
+        textTransform: "none",
+        fontWeight: 600,
+      },
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: "none",
+          },
+        },
+      },
+    },
+  });
+};
+
+// Backward compatibility
+export const darkTheme = getTheme("dark", accentColors.DeepPurple);
+export const lightTheme = getTheme("light", accentColors.DeepPurple);
 
 export interface ThemeInput {
-  setTheme: Dispatch<SetStateAction<Theme>>;
+  setTheme?: Dispatch<SetStateAction<Theme>>; // Optional now, or deprecated
+  toggleThemeMode?: () => void;
   appTheme?: Theme;
+  setAccentColor?: (color: string) => void;
+  accentColor?: string;
 }
 
 export const jsonEditCustomTheme = {

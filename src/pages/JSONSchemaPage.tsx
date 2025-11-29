@@ -50,7 +50,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
   theme = darkTheme,
   setSnackbarConfig,
 }) => {
-  const monacoTheme = theme === darkTheme ? "vs-dark" : "light";
+  const monacoTheme = theme.palette.mode === "dark" ? "vs-dark" : "light";
   const [result, setResult] = useState<string | undefined>();
   const [isValid, setIsValid] = useState<boolean>(true);
   const [allErrors, toggleAllErrors] = useState<boolean>(true);
@@ -151,9 +151,9 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
           isValid
             ? successMessage
             : {
-                result: "Invalid JSON",
-                errors: validate.errors,
-              },
+              result: "Invalid JSON",
+              errors: validate.errors,
+            },
           null,
           2
         )
@@ -263,11 +263,10 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
             {generateWaterMark(RESULT)}
             <Box
               style={{
-                boxShadow: `0 0 25px ${
-                  isValid
+                boxShadow: `0 0 25px ${isValid
                     ? alpha(theme.palette.success.main, 1)
                     : alpha(theme.palette.error.main, 1)
-                }`,
+                  }`,
               }}
             >
               <Editor

@@ -22,15 +22,16 @@ import { extraUtilities, mainUtilities } from "../../data/Utilities";
 import { UtilityDetails } from "../../types/DrawerTypes";
 import renderUtility from "../../utils/CommonUtils";
 import DarkModeSwitch from "../navbar/DarkModeSwitch";
+import AccentPicker from "../navbar/AccentPicker";
 import GithubStarCount from "../navbar/GithubStarCount";
 import SnackbarAlert, { SnackbarConfig } from "../SnackbarAlert";
 
-export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
+export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, accentColor }: ThemeInput) {
   const theme = useTheme();
   const [isDrawerOpen, toggleDrawer] = React.useState(true);
   const [editorData, setEditorData] = React.useState(defaultEditorJSON);
   const [currentUtility, setCurrentUtility] = React.useState(
-    mainUtilities.FORMAT
+    mainUtilities.HOME
   );
   // Snackbar Configuration
   const [snackbarConfig, setSnackbarConfig] = React.useState<SnackbarConfig>({
@@ -57,13 +58,16 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
           <ListItem key={utilityName} disablePadding sx={{ display: "block" }}>
             <ListItemButton
               onClick={() => {
-                currentUtility.isOpen = false;
+                // Reset all isOpen flags
+                Object.values(mainUtilities).forEach(u => u.isOpen = false);
+                Object.values(extraUtilities).forEach(u => u.isOpen = false);
+
                 utilityDetails.isOpen = true;
                 setCurrentUtility(utilityDetails);
               }}
               sx={[
                 {
-                  color: utilityDetails.isOpen
+                  color: currentUtility.toolName === utilityDetails.toolName
                     ? appTheme?.palette.primary.main
                     : appTheme?.palette.text.disabled,
                   minHeight: 48,
@@ -71,18 +75,18 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
                 },
                 open
                   ? {
-                      justifyContent: "initial",
-                    }
+                    justifyContent: "initial",
+                  }
                   : {
-                      justifyContent: "center",
-                    },
+                    justifyContent: "center",
+                  },
               ]}
             >
               <Tooltip title={utilityDetails.tooltip}>
                 <ListItemIcon
                   sx={[
                     {
-                      color: utilityDetails.isOpen
+                      color: currentUtility.toolName === utilityDetails.toolName
                         ? appTheme?.palette.primary.main
                         : appTheme?.palette.text.disabled,
                       minWidth: 0,
@@ -90,11 +94,11 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
                     },
                     open
                       ? {
-                          mr: 3,
-                        }
+                        mr: 3,
+                      }
                       : {
-                          mr: "auto",
-                        },
+                        mr: "auto",
+                      },
                   ]}
                 >
                   {utilityDetails.navIcon}
@@ -105,11 +109,11 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
                 sx={[
                   open
                     ? {
-                        opacity: 1,
-                      }
+                      opacity: 1,
+                    }
                     : {
-                        opacity: 0,
-                      },
+                      opacity: 0,
+                    },
                 ]}
                 primaryTypographyProps={{
                   variant: "button", // Apply your desired typography variant
@@ -150,8 +154,9 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
           >
             {currentUtility["toolName"]}
           </Typography>
-          <Stack sx={{ ml: "auto" }} direction="row">
-            <DarkModeSwitch setTheme={setTheme} />
+          <Stack sx={{ ml: "auto" }} direction="row" alignItems="center">
+            <DarkModeSwitch toggleThemeMode={toggleThemeMode} />
+            <AccentPicker setAccentColor={setAccentColor} accentColor={accentColor} />
             <GithubStarCount owner="uniquedm" repo="json-tools" />
           </Stack>
         </Toolbar>
@@ -161,8 +166,19 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
           <HomeRepairService fontSize="medium" color="inherit" />
           <Box sx={{ ml: 1 }}>
             {" "}
-            <Typography variant="h6" color="primary">
-              <strong>JSON TOOLS</strong>
+            <Typography
+              variant="h6"
+              sx={{
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                textFillColor: "transparent",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: 800,
+                letterSpacing: ".1rem",
+              }}
+            >
+              JSON TOOLS
             </Typography>
           </Box>
           <IconButton onClick={handleDrawerClose}>
@@ -191,6 +207,8 @@ export default function AppDrawer({ setTheme, appTheme }: ThemeInput) {
           theme: appTheme,
           snackbarConfig: snackbarConfig,
           setSnackbarConfig: setSnackbarConfig,
+          setUtility: setCurrentUtility,
+          allUtilities: { ...mainUtilities, ...extraUtilities },
         })}
       </Box>
       <SnackbarAlert
@@ -272,14 +290,24 @@ const Drawer = styled(MuiDrawer, {
       props: ({ open }) => open,
       style: {
         ...openedMixin(theme),
-        "& .MuiDrawer-paper": openedMixin(theme),
+        "& .MuiDrawer-paper": {
+          ...openedMixin(theme),
+          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(12px)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+        },
       },
     },
     {
       props: ({ open }) => !open,
       style: {
         ...closedMixin(theme),
-        "& .MuiDrawer-paper": closedMixin(theme),
+        "& .MuiDrawer-paper": {
+          ...closedMixin(theme),
+          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(12px)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+        },
       },
     },
   ],
