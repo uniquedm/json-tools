@@ -186,7 +186,7 @@ export const JSONSchemaValidator: React.FC<UtilityProps> = ({
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
       {/* Container for buttons and options */}
-      <Grid2 container sx={{ mt: 4 }} spacing={3}>
+      <Grid2 container spacing={3}>
         <Grid2 size={12}>
           <Stack spacing={2} direction="column">
             <Paper

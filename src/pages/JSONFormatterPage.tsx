@@ -586,7 +586,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
         </MenuItem>
       </Menu>
 
-      <Grid2 container sx={{ mt: 4 }} spacing={3}>
+      <Grid2 container spacing={3}>
         <Grid2 size={12}>
           <Paper
             elevation={0}

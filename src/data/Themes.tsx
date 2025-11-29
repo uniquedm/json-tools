@@ -24,7 +24,9 @@ export const getTheme = (mode: "light" | "dark", accentColor: string): Theme => 
                 : accentColor === accentColors.Graphite
                   ? "#90A4AE"
                   : accentColor
-            : accentColor,
+            : accentColor === accentColors.CrimsonRed
+              ? "#D32F2F"
+              : accentColor,
       },
       background: {
         default: mode === "dark" ? "#121212" : "#f5f5f5",

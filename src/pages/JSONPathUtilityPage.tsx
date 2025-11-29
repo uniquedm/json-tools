@@ -272,7 +272,7 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Grid2 container sx={{ mt: 4 }} spacing={3}>
+      <Grid2 container spacing={3}>
         <Box sx={{ flex: 1 }}>
           <Stack spacing={3} direction="column">
             <Paper
@@ -496,10 +496,11 @@ export const JSONPathUtility: React.FC<UtilityProps> = ({
   );
 };
 
-const StyledPaper = styled(Paper)(({ }) => ({
-  backgroundColor: "rgba(0, 0, 0, 0.1)",
-  backdropFilter: "blur(10px)",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
+  backgroundImage: 'none',
+  boxShadow: theme.shadows[4],
+  border: `1px solid ${theme.palette.divider}`,
 }));
 
 const modalStyle = {

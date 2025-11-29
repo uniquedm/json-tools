@@ -98,21 +98,35 @@ export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, a
                           : appTheme?.palette.text.secondary,
                       minHeight: 48,
                       px: 2.5,
-                      mx: 1,
+                      mx: 1.5, // Increased margin for floating look
                       borderRadius: 2,
                       mb: 0.5,
-                      transition: "all 0.2s ease-in-out",
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                       "&:hover": {
                         backgroundColor: appTheme?.palette.mode === 'dark'
                           ? `${appTheme?.palette.primary.main}15`
                           : `${appTheme?.palette.primary.main}10`,
+                        transform: 'translateX(4px)',
                       },
                     },
                     currentUtility.toolName === utilityDetails.toolName && {
                       backgroundColor: appTheme?.palette.mode === 'dark'
-                        ? `${appTheme?.palette.primary.main}20`
-                        : `${appTheme?.palette.primary.main}15`,
+                        ? `${appTheme?.palette.primary.main}25`
+                        : `${appTheme?.palette.primary.main}20`,
                       fontWeight: "bold",
+                      "&::before": {
+                        content: '""',
+                        position: 'absolute',
+                        left: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        height: '60%',
+                        width: 4,
+                        backgroundColor: appTheme?.palette.primary.main,
+                        borderRadius: '0 4px 4px 0',
+                      }
                     },
                     open
                       ? {
@@ -120,7 +134,8 @@ export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, a
                       }
                       : {
                         justifyContent: "center",
-                        px: 1, // Reduce padding when closed
+                        px: 1,
+                        mx: 1,
                       },
                   ]}
                 >
@@ -181,7 +196,7 @@ export default function AppDrawer({ toggleThemeMode, appTheme, setAccentColor, a
   return (
     <Box sx={{ display: "flex", flexGrow: 1, flexBasis: 0 }}>
       <AppBar position="fixed" open={isDrawerOpen}>
-        <Toolbar>
+        <Toolbar variant="dense">
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -295,6 +310,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
+  minHeight: '48px !important', // Force dense height
 }));
 
 interface AppBarProps extends MuiAppBarProps {
@@ -338,7 +354,8 @@ const Drawer = styled(MuiDrawer, {
         ...openedMixin(theme),
         "& .MuiDrawer-paper": {
           ...openedMixin(theme),
-          backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
+          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(12px)',
           borderRight: `1px solid ${theme.palette.divider}`,
         },
       },
@@ -349,7 +366,8 @@ const Drawer = styled(MuiDrawer, {
         ...closedMixin(theme),
         "& .MuiDrawer-paper": {
           ...closedMixin(theme),
-          backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
+          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(12px)',
           borderRight: `1px solid ${theme.palette.divider}`,
         },
       },

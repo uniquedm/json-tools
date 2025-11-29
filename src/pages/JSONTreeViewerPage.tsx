@@ -95,7 +95,7 @@ export const JSONTreeViewer: React.FC<UtilityProps> = ({
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Grid2 container sx={{ mt: 4 }} spacing={3}>
+      <Grid2 container spacing={3}>
         <Grid2 size={12}>
           <Stack spacing={2} direction="column">
             <Paper
