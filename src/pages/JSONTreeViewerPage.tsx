@@ -240,7 +240,8 @@ export function jsonTreeEditor(
         nestedArray: number[];
         nestedObject: { deepNestedField: string };
       };
-    }
+    },
+  onUpdate?: (data: any) => void
 ) {
   return (
     <JsonEditor
@@ -261,6 +262,7 @@ export function jsonTreeEditor(
       restrictDelete={!options.includes("Delete")}
       theme={jsonEditorTheme}
       data={editorData}
+      onUpdate={onUpdate}
     />
   );
 }

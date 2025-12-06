@@ -1,4 +1,4 @@
-import { Editor, OnMount } from "@monaco-editor/react";
+import { DiffEditor, Editor, OnMount } from "@monaco-editor/react";
 import { Add, Close, Edit, Lock, LockOpen, MoreVert, Settings } from "@mui/icons-material";
 import {
   Box,
@@ -22,6 +22,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  alpha,
 } from "@mui/material";
 import * as monacoEditor from "monaco-editor";
 import React, { useEffect, useState } from "react";
@@ -78,6 +79,8 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
 
   const [isTreeView, setTreeView] = useState(false);
+  const [isDiffView, setDiffView] = useState(false);
+  const [diffOriginal, setDiffOriginal] = useState("");
   const [settings, toggleSettings] = useState<boolean>(false);
 
   // --- Tab Management State ---
@@ -108,6 +111,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActiveTabId(newValue);
     setTreeView(false);
+    setDiffView(false);
   };
 
   const handleAddTab = () => {
@@ -122,6 +126,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
     setTabs([...tabs, newTab]);
     setActiveTabId(newId);
     setTreeView(false);
+    setDiffView(false);
   };
 
   // --- Context Menu (Rename & Lock) ---
@@ -264,31 +269,37 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
   const handleRemoveNullValues = () => {
     setTreeView(false);
+    setDiffView(false);
     removeNullValuesJSON(editorRef, setSnackbarConfig);
   };
 
   const handleRepairValues = () => {
     setTreeView(false);
+    setDiffView(false);
     repairJSON(editorRef, setSnackbarConfig);
   };
 
   const handleUnescapeJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     unescapeJSONFunction(editorRef, setSnackbarConfig);
   };
 
   const handleEscapeJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     escapeJSON(editorRef, setSnackbarConfig);
   };
 
   const handleCompactJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     compactJSON(editorRef, setSnackbarConfig);
   };
 
   const handleFlattenJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     flattenJSON(
       editorRef,
       setSnackbarConfig,
@@ -300,6 +311,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
   const handleUnflattenJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     unflattenJSON(
       editorRef,
       setSnackbarConfig,
@@ -311,16 +323,19 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
   const handleFormatJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     formatJSON(editorRef, setSnackbarConfig);
   };
 
   const handleSortJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     sortJSON(editorRef, setSnackbarConfig);
   };
 
   const handleReverseJSON = () => {
     setTreeView(false);
+    setDiffView(false);
     reverseJSON(editorRef, setSnackbarConfig);
   };
 
@@ -334,6 +349,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
   const handleLoadFile = () => {
     setTreeView(false);
+    setDiffView(false);
     const setContentWrapper = (data: any) => {
       updateActiveTabContent(JSON.stringify(data, null, 2));
     };
@@ -345,7 +361,18 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   };
 
   const toggleTreeView = () => {
+    if (!isTreeView) setDiffView(false);
     setTreeView((prevValue) => !prevValue);
+  };
+
+  const toggleDiffView = () => {
+    if (!isDiffView) {
+      setTreeView(false);
+      if (!diffOriginal && activeTab?.content) {
+        setDiffOriginal(activeTab.content);
+      }
+    }
+    setDiffView((prev) => !prev);
   };
 
   const actionList = createActionList({
@@ -476,7 +503,16 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
 
     try {
       const parsedJson = JSON.parse(activeTab.content);
-      return jsonTreeEditor(true, 99, [], jsonEditorTheme, parsedJson);
+      return jsonTreeEditor(
+        true,
+        99,
+        ["Add", "Edit", "Delete"],
+        jsonEditorTheme,
+        parsedJson,
+        (data: any) => {
+          updateActiveTabContent(JSON.stringify(data.newData, null, 2));
+        }
+      );
     } catch (error) {
       if (setSnackbarConfig) {
         setTreeView(false);
@@ -493,6 +529,28 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
   const handleEditorChange = (value: string | undefined) => {
     updateActiveTabContent(value ?? "");
   };
+
+  const generateWaterMark = (text: string, leftPosition: string) => (
+    <Box
+      sx={{
+        position: "absolute",
+        bottom: 16,
+        left: leftPosition,
+        transform: "translateX(-50%)",
+        color: "rgba(128, 128, 128, 0.15)",
+        fontSize: "3rem",
+        fontWeight: 900,
+        pointerEvents: "none",
+        zIndex: 1,
+        whiteSpace: "nowrap",
+        userSelect: 'none',
+        fontFamily: 'monospace',
+        letterSpacing: '0.2rem'
+      }}
+    >
+      {text}
+    </Box>
+  );
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -664,7 +722,7 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
               border: `1px solid ${theme.palette.divider}`,
             }}
           >
-            {!isTreeView && (
+            {!isTreeView && !isDiffView && (
               <Editor
                 theme={monacoTheme}
                 value={activeTab?.content || ""}
@@ -682,10 +740,43 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
                 onMount={handleEditorDidMount}
               />
             )}
+            {isDiffView && (
+              <>
+                {generateWaterMark("ORIGINAL", "25%")}
+                {generateWaterMark("MODIFIED", "75%")}
+                <DiffEditor
+                  theme={monacoTheme}
+                  height="100%"
+                  language="json"
+                  original={diffOriginal}
+                  modified={activeTab?.content || ""}
+                  onMount={(editor: any, _monaco) => {
+                    const diffEditor = editor as monacoEditor.editor.IStandaloneDiffEditor;
+                    diffEditor.getModifiedEditor().onDidChangeModelContent(() => {
+                      handleEditorChange(diffEditor.getModifiedEditor().getValue());
+                    });
+                    diffEditor.getOriginalEditor().onDidChangeModelContent(() => {
+                      setDiffOriginal(diffEditor.getOriginalEditor().getValue());
+                    });
+                  }}
+                  options={{
+                    originalEditable: true,
+                    minimap: { enabled: editorMinimap },
+                    padding: { top: 24, bottom: 24 },
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                    lineHeight: 24,
+                    renderSideBySide: true
+                  }}
+                />
+              </>
+            )}
             {isTreeView && getTreeView()}
             <EditorFAB
               isTreeView={isTreeView}
               toggleTreeView={toggleTreeView}
+              isDiffView={isDiffView}
+              toggleDiffView={toggleDiffView}
             />
           </Paper>
 
@@ -703,116 +794,117 @@ export const JSONFormatter: React.FC<UtilityProps> = ({
               border: `1px solid ${theme.palette.divider}`,
             }}
           >
-            <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Tooltip title="New File">
-                    <IconButton
-                      onClick={handleAddTab}
-                      size="small"
-                      sx={{
-                        bgcolor: 'primary.main',
-                        color: 'white',
-                        width: 32,
-                        height: 32,
-                        '&:hover': {
-                          bgcolor: 'primary.dark',
-                          transform: 'scale(1.05)',
-                          transition: 'transform 0.2s'
-                        }
-                      }}
-                    >
-                      <Add fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
-                    New Tab
-                  </Typography>
-                </Stack>
-                <Tooltip title="More Options">
-                  <IconButton
-                    onClick={handleHeaderMenuOpen}
-                    size="small"
+            <Box sx={{ p: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined" // If dashed isn't a valid variant, we'll use outlined with some custom dash styling, but let's stick to contained or outlined for now. Let's make it a nice big button.
+                onClick={handleAddTab}
+                startIcon={<Add />}
+                sx={{
+                  justifyContent: 'flex-start',
+                  borderColor: theme.palette.divider,
+                  borderWidth: '1px',
+                  borderStyle: 'dashed',
+                  color: 'text.secondary',
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    borderStyle: 'solid',
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    color: 'primary.main',
+                  }
+                }}
+              >
+                New Tab
+              </Button>
+            </Box>
+            <Divider />
+            <Box sx={{ flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <Tabs
+                orientation="vertical"
+                variant="scrollable"
+                value={activeTabId}
+                onChange={handleTabChange}
+                sx={{
+                  flexGrow: 1,
+                  [`& .MuiTabs-indicator`]: {
+                    display: 'none', // Hide default indicator
+                  },
+                  px: 1.5, // Padding for the container
+                  pt: 1.5
+                }}
+              >
+                {tabs?.map((tab) => (
+                  <Tab
+                    key={tab.id}
+                    value={tab.id}
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', py: 0.5 }}>
+                        <Typography variant="body2" noWrap sx={{ maxWidth: 160, fontWeight: activeTabId === tab.id ? 600 : 400, fontSize: '0.9rem' }}>
+                          {tab.name}
+                        </Typography>
+                        {tab.isLocked && <Lock fontSize="small" sx={{ fontSize: '0.8rem', opacity: 0.5, mr: 1 }} />}
+                        {!tab.isLocked && tabs.length > 1 && (
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleCloseTab(e, tab.id)}
+                            sx={{
+                              opacity: 0,
+                              transition: 'all 0.2s',
+                              padding: 0.5,
+                              '&:hover': { bgcolor: 'error.soft', color: 'error.main' }
+                            }}
+                            className="close-btn"
+                          >
+                            <Close fontSize="small" sx={{ fontSize: '0.9rem' }} />
+                          </IconButton>
+                        )}
+                      </Box>
+                    }
+                    onContextMenu={(e) => handleContextMenu(e, tab.id)}
                     sx={{
-                      width: 32,
-                      height: 32,
-                      ml: 0.5,
+                      alignItems: 'flex-start',
+                      textAlign: 'left',
+                      minHeight: 48,
+                      borderBottom: `1px solid ${theme.palette.divider}`,
+                      textTransform: 'none',
+                      mx: 1,
+                      mt: 1,
+                      borderRadius: 2,
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                        '& .close-btn': { opacity: 0.7 }
+                      },
+                      '&.Mui-selected': {
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                        color: 'primary.main',
+                        '& .close-btn': { opacity: 1 }
                       }
                     }}
-                  >
-                    <MoreVert fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
+                  />
+                ))}
+              </Tabs>
             </Box>
-            <Tabs
-              orientation="vertical"
-              variant="scrollable"
-              value={activeTabId}
-              onChange={handleTabChange}
-              sx={{
-                flexGrow: 1,
-                '& .MuiTabs-indicator': {
-                  left: 0,
-                  width: 3,
-                  borderRadius: '0 4px 4px 0',
-                  backgroundColor: 'primary.main'
-                }
-              }}
-            >
-              {tabs?.map((tab) => (
-                <Tab
-                  key={tab.id}
-                  value={tab.id}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', py: 0.5 }}>
-                      <Typography variant="body2" noWrap sx={{ maxWidth: 160, fontWeight: activeTabId === tab.id ? 600 : 400, fontSize: '0.9rem' }}>
-                        {tab.name}
-                      </Typography>
-                      {tab.isLocked && <Lock fontSize="small" sx={{ fontSize: '0.8rem', opacity: 0.5, mr: 1 }} />}
-                      {!tab.isLocked && tabs.length > 1 && (
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleCloseTab(e, tab.id)}
-                          sx={{
-                            opacity: 0,
-                            transition: 'all 0.2s',
-                            padding: 0.5,
-                            '&:hover': { bgcolor: 'error.soft', color: 'error.main' }
-                          }}
-                          className="close-btn"
-                        >
-                          <Close fontSize="small" sx={{ fontSize: '0.9rem' }} />
-                        </IconButton>
-                      )}
-                    </Box>
-                  }
-                  onContextMenu={(e) => handleContextMenu(e, tab.id)}
-                  sx={{
-                    alignItems: 'flex-start',
-                    textAlign: 'left',
-                    minHeight: 48,
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                    textTransform: 'none',
-                    mx: 1,
-                    mt: 1,
-                    borderRadius: 2,
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-                      '& .close-btn': { opacity: 0.7 }
-                    },
-                    '&.Mui-selected': {
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-                      color: 'primary.main',
-                      '& .close-btn': { opacity: 1 }
-                    }
-                  }}
-                />
-              ))}
-            </Tabs>
+            <Divider />
+            <Box sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
+              <Button
+                size="small"
+                color="inherit"
+                onClick={handleHeaderMenuOpen}
+                endIcon={<MoreVert fontSize="small" />}
+                sx={{
+                  textTransform: 'none',
+                  color: 'text.secondary',
+                  borderRadius: 2,
+                  fontSize: '0.8rem'
+                }}
+              >
+                More Actions
+              </Button>
+            </Box>
           </Paper>
         </Grid2>
       </Grid2>

@@ -209,7 +209,7 @@ export const DifferenceUtility: React.FC<UtilityProps> = ({
                     <Button
                       onClick={handleToggleLock}
                       variant={isLocked ? "contained" : "outlined"}
-                      color={isLocked ? "warning" : "inherit"}
+                      color={isLocked ? "warning" : "primary"}
                       startIcon={isLocked ? <Lock /> : <LockOpen />}
                       sx={{ textTransform: 'none', fontWeight: 600 }}
                     >
